@@ -5,26 +5,49 @@ date: "November 29, 2018"
 output: pdf_document
 ---
 
+
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```
+credit.trainIdx<-readRDS("credit.trainIdx.rds")
+credit.Datos.Train<-credit[credit.trainIdx,]
+credit.Datos.Test<-credit[-credit.trainIdx,]
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+nrow(credit.Datos.Train)
+nrow(credit.Datos.Test)
 ```
 
-## Including Plots
+# Preprocesar Datos
+## Analizar las variables (análisis monovariable y multivariables)
 
-You can also embed plots, for example:
+## Tratar valores nulos/externos/atípicos/desconocidos si los hubiese
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+## Eliminar variables superfluas/añadir variables nuevas
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Transformar justificadamente los datos (normalizar/escalar/etc)
+
+
+
+
+# Entrenar varios Modelos/Técnicas
+
+## Escoger varios modelos/técnicas a comparar
+
+## Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
+
+## Probar, al menos, un mismo modelo/técnica con 2 preprocesos de datos diferentes
+
+
+
+# Comparar Modelos
+
+## Comparar el rendimiento de los diferentes modelos
+
+## Decidir justificadamente el modelo final
+
+## Evaluar el rendimiento futuro del modelo final
