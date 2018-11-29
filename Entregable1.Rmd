@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r setup, include=FALSE}
 
-credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data")
+credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",")
 
 
 credit.trainIdx<-readRDS("credit.trainIdx.rds")
