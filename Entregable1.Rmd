@@ -5,13 +5,14 @@ date: "November 29, 2018"
 output: pdf_document
 ---
 
-
+# Índice
 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Carga de la base de datos
 
 ```{r setup, include=FALSE}
 
