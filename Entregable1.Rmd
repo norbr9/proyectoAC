@@ -19,6 +19,25 @@ knitr::opts_chunk$set(echo = TRUE)
 credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",", na.strings = "?", header = F)
 colnames(credit) <- c("A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","A13","A14","A15","A16")
 
+# Informacion de los atributos. Columnas
+# A1:	b, a. 
+# A2:	continuous. 
+# A3:	continuous. 
+# A4:	u, y, l, t. 
+# A5:	g, p, gg. 
+# A6:	c, d, cc, i, j, k, m, r, q, w, x, e, aa, ff. 
+# A7:	v, h, bb, j, n, z, dd, ff, o. 
+# A8:	continuous. 
+# A9:	t, f. 
+# A10:	t, f. 
+# A11:	continuous. 
+# A12:	t, f. 
+# A13:	g, p, s. 
+# A14:	continuous. 
+# A15:	continuous. 
+# A16: +,- (class attribute)
+
+
 
 credit.trainIdx<-readRDS("credit.trainIdx.rds")
 credit.Datos.Train<-credit[credit.trainIdx,]
