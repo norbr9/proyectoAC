@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r setup, include=FALSE}
 
-credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",")
+credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",", na.strings = "?", header = F)
 
 
 credit.trainIdx<-readRDS("credit.trainIdx.rds")
@@ -28,6 +28,20 @@ nrow(credit.Datos.Test)
 
 # Preprocesar Datos
 ## Analizar las variables (análisis monovariable y multivariables)
+
+```{r setup, include=FALSE}
+
+# Resumen de los datos
+
+summary(credit.Datos.Train)
+
+summary(credit.Datos.Test)
+
+summary(credit)
+
+
+```
+
 
 ## Tratar valores nulos/externos/atípicos/desconocidos si los hubiese
 
