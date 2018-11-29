@@ -54,11 +54,22 @@ nrow(credit.Datos.Test)
 
 # Resumen de los datos
 
-summary(credit.Datos.Train)
+summary(credit).
 
-summary(credit.Datos.Test)
 
-summary(credit)
+
+# Analisis variable A6
+
+summary(credit[6], maxsum = Inf)
+
+
+
+# Analisis variable A2
+summary(credit[2], maxsum = Inf)
+
+
+# Analisis variable A14
+summary(credit[14], maxsum = Inf)
 
 
 ```
