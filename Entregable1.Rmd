@@ -62,6 +62,14 @@ summary(credit).
 
 summary(credit[6], maxsum = Inf)
 
+# Numero de ocurrencias (porcentaje)
+porcent <- prop.table(table(credit$A6)) * 100
+cbind(total=table(credit$A6), porcentaje=porcent)
+
+# Grafico de barras
+barplot(table(credit$A6))
+
+
 
 
 # Analisis variable A2
