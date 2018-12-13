@@ -48,7 +48,7 @@ nrow(credit.Datos.Test)
 ```
 
 # Preprocesar Datos
-## Analizar las variables (análisis monovariable y multivariables)
+## Analizar las variables (análisis monovariable)
 
 ```{r setup, include=FALSE}
 
@@ -435,8 +435,43 @@ qqplot.data(credit$A15)+ggtitle("Gráfica Q-Q para A15")                        
 #######################################################################################################
 ```
 
+## Analizar las variables (multivariable)
+```{r}
+```
+
+
+
 
 ## Tratar valores nulos/externos/atípicos/desconocidos si los hubiese
+### Tratamiento de valores nulos
+Para tomar medida de cuán serio es el problema de los valores nulos, debemos contar los casos que tienen valores nulos
+```{r}
+# Tratamiento de valores nulos
+
+# Elementos que queremos tratar
+tibble::rowid_to_column(credit)[!complete.cases(credit),]
+
+# Numero de filas con nulos
+print("Numero de filas con valores nulos")
+nrow(credit[!complete.cases(credit),])
+
+# Porcentaje de valores nulos
+print("Porcentaje de filas con valores nulos")
+nrow(credit[!complete.cases(credit),])/nrow(credit)*100
+
+```
+Como vemos tenemos 37 filas con valores filas con valores nulos, lo  que supone un 5,362319% de casos.
+
+No es recomendable deshacernos de los nulos sin más, ademas no hay ningun ejemplar que tenga muchas variables con valores nulos, por lo tanto la solucion seriá sustituirlas mediante valores representativos.
+
+
+#### Sustitución mediante valores representativos
+Como la muestra tiene una distribucion desplazada skewed, la mediana es la mejor opcion como valor central para sustituir.
+
+
+
+
+
 
 ## Eliminar variables superfluas/añadir variables nuevas
 
