@@ -447,21 +447,26 @@ qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income")                  
 #######################################################################################################
 ```
 
-## Analizar las variables (multivariable)
-```{r}
-```
 
-
-
-
-
-## Análisis multivariable
+### Análisis multivariable
 
 Para hacer las multivariables haremos uniones con la variable de clase de salida ( +,-), para ver como influyen. 
 
 ```{r}
-pairs(creadit[1:4],col=as.numeric(iris$clase))
+#pairs(credit[,2],col=as.numeric(credit$class))
+#pairs(credit,credit$class)
+#featurePlot(x=iris[,1:4],y=iris[,5],plot="ellipse")
+featurePlot(x=credit[,2],y=credit[,16],plot="density")
+###Variable Male table(credit$Male)
 
+
+y = credit[16]
+#Variable Age
+featurePlot(x=credit[,2],y=credit[,16],plot="density")
+##pairs(credit[,1],col=as.factor(credit$Class))
+
+#Variable Debt
+featurePlot(x=credit[,3],y=credit[,16],plot="density")
 
 ```
 
@@ -500,6 +505,8 @@ Como la muestra tiene una distribucion desplazada skewed, la mediana es la mejor
 
 
 ## Eliminar variables superfluas/añadir variables nuevas
+
+
 
 ## Transformar justificadamente los datos (normalizar/escalar/etc)
 
