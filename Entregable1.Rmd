@@ -12,9 +12,18 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+````{r,eval=FALSE}
+##para que no se ejecuten el cacho de código
+
+````
+
 # Carga de la base de datos
 
 ```{r setup, include=FALSE}
+#Carga de librerías necesarias
+library(ggplot2)
+library(lattice)
+library(caret)
 
 credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",", na.strings = "?", header = F)
 colnames(credit) <- c("A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","A13","A14","A15","A16")
@@ -49,6 +58,7 @@ nrow(credit.Datos.Test)
 
 # Preprocesar Datos
 ## Analizar las variables (análisis monovariable y multivariables)
+
 
 ```{r setup, include=FALSE}
 
@@ -435,6 +445,7 @@ qqplot.data(credit$A15)+ggtitle("Gráfica Q-Q para A15")                        
 #######################################################################################################
 ```
 
+Para hacer las multivariables hacer uniones con la variable de clase de salida ( +,-), para ver como influyen. 
 
 ## Tratar valores nulos/externos/atípicos/desconocidos si los hubiese
 
