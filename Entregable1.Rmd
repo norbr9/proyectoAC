@@ -468,7 +468,7 @@ pairs(creadit[1:4],col=as.numeric(iris$clase))
 
 
 
-## Tratar valores nulos/externos/atípicos/desconocidos si los hubiese
+## Tratar valores nulos/extremos/atípicos si los hubiese
 ### Tratamiento de valores nulos
 Para tomar medida de cuán serio es el problema de los valores nulos, debemos contar los casos que tienen valores nulos
 ```{r}
@@ -492,14 +492,54 @@ No es recomendable deshacernos de los nulos sin más, ademas no hay ningun ejemp
 
 
 #### Sustitución mediante valores representativos
-Como la muestra tiene una distribucion desplazada skewed, la mediana es la mejor opcion como valor central para sustituir.
+Como la muestra tiene una distribucion desplazada skewed para TODAS las variables continuas, la mediana es la mejor opcion como valor central para sustituir.
+
+Para las variables no continuas sustituiremos los valores nulos por el valor que mas se repita
 
 
+```{r}
+# Tratamiento de las variables en funcion de si es continua o no continua
+credit.fix<-credit
+continua<-c(FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE)
 
+for(i in 1:15){
+  if(continua[i]){
+    nulos <- subset(credit.fix, is.na(credit.fix[,i]))
+    credit.fix[as.numeric(rownames(nulos)), i] <-median(credit.fix[[i]],na.rm=T)
+    
+  } else {
+    valorMasRepetido<-tail(names(sort(table(credit[i]))), 1)
+    nulos <- subset(credit.fix, is.na(credit.fix[,i]))
+    credit.fix[as.numeric(rownames(nulos)), i] <- valorMasRepetido
+  }
+}
+
+```
+
+Y comprobamos si se han sustituido correctamente
+```{r}
+print("Porcentaje de filas con valores nulos")
+nrow(credit[!complete.cases(credit.fix),])/nrow(credit.fix)*100
+```
+
+### Tratamiento de valores extremos/atipicos
+Sustitucion de los valores extremos y atipicos por la mediana de la variable en cuestion
+```{r}
+for(i in 1:15){
+  if(!continua[i]) next;
+  
+  extremos<-boxplot(credit.fix[i],boxwex=0.15,plot=F)$out
+  porArriba<-min(extremos[extremos > median(na.omit(credit.fix[[i]]))])
+  porArribaSet <- credit.fix[credit.fix[i]>porArriba,]
+  credit.fix[as.numeric(rownames(porArribaSet)), i] <- median(credit.fix[[i]],na.rm=T)
+}
+```
 
 
 
 ## Eliminar variables superfluas/añadir variables nuevas
+
+
 
 ## Transformar justificadamente los datos (normalizar/escalar/etc)
 
