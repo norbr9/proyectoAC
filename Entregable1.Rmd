@@ -26,25 +26,25 @@ library(lattice)
 library(caret)
 
 credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",", na.strings = "?", header = F)
-colnames(credit) <- c("A1","A2","A3","A4","A5","A6","A7","A8","A9","A10","A11","A12","A13","A14","A15","A16")
+colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLevel","Ethnicity","YearsEmployed","PriorDefaul","Employed","CreditScore","DriversLicense","Citizen","ZipCode","Income","Class")
 
 # Informacion de los atributos. Columnas
-# A1:	b, a. 
-# A2:	continuous. 
-# A3:	continuous. 
-# A4:	u, y, l, t. 
-# A5:	g, p, gg. 
-# A6:	c, d, cc, i, j, k, m, r, q, w, x, e, aa, ff. 
-# A7:	v, h, bb, j, n, z, dd, ff, o. 
-# A8:	continuous. 
-# A9:	t, f. 
-# A10:	t, f. 
-# A11:	continuous. 
-# A12:	t, f. 
-# A13:	g, p, s. 
-# A14:	continuous. 
-# A15:	continuous. 
-# A16: +,- (class attribute)
+# Male:	b, a. 
+# Age:	continuous. 
+# Debt:	continuous. 
+# Married:	u, y, l, t. 
+# BankCustomer:	g, p, gg. 
+# EducationLevel:	c, d, cc, i, j, k, m, r, q, w, x, e, aa, ff. 
+# Ethnicity:	v, h, bb, j, n, z, dd, ff, o. 
+# YearsEmployed:	continuous. 
+# PriorDefaul:	t, f. 
+# Employed:	t, f. 
+# CreditScore:	continuous. 
+# DriversLicense:	t, f. 
+# Citizen:	g, p, s. 
+# ZipCode:	continuous. 
+# Income:	continuous. 
+# Class: +,- (class attribute)
 
 
 
@@ -79,373 +79,388 @@ qqplot.data <- function (vec)                                                   
 
 summary(credit)
 
-#######Analisis variable A1############################################################################
-# Variable Discreta                                                                                   #
+#######Analisis variable Male############################################################################
+# Variable No Numérica                                                                                
 # Resumen                                                                                             #
 summary(credit[1], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A1)) * 100                                                         #
-cbind(total=table(credit$A6), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$Male)) * 100                                                         #
+cbind(total=table(credit$EducationLevel), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A1))                                                                             #
+barplot(table(credit$Male))                                                                             #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
+```
 
 
-#######Analisis variable A2############################################################################
+```{r setup, include=FALSE}
+#######Analisis variable Age############################################################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[2], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A2)) * 100                                                         #
-cbind(total=table(credit$A2), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$Age)) * 100                                                         #
+cbind(total=table(credit$Age), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Histograma con frecuencias de aparicion                                                             #
 # Estimacion de la fucnion de desidad de probabilidad                                                 #
-dens<-density(credit$A2,na.rm=T)                                                                      #
-hist(credit$A2,xlab="",main="A2",ylim=c(0,max(dens$y)*1.1),probability =T)                            #
+dens<-density(credit$Age,na.rm=T)                                                                      #
+hist(credit$Age,xlab="",main="Age",ylim=c(0,max(dens$y)*1.1),probability =T)                            #
 lines(dens)                                                                                           #
 # rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      #
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           #
 # por si hubiese valores repetidos                                                                    #
-rug(jitter(credit$A2))                                                                                #
+rug(jitter(credit$Age))                                                                                #
                                                                                                       #
                                                                                                       #
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        #
 # y posibles valores atipicos                                                                         #
-boxplot(credit$A2,main="A2")                                                                          #
+boxplot(credit$Age,main="Age")                                                                          #
                                                                                                       #
                                                                                                       #
 # Representacion de los percentiles con respecto a los de una normal centrada en cero                 #
-qqplot.data(credit$A2)+ggtitle("Gráfica Q-Q para A2")                                                 #
+qqplot.data(credit$Age)+ggtitle("Gráfica Q-Q para Age")                                                 #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A3############################################################################
+#######Analisis variable Debt############################################################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[3], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A3)) * 100                                                         #
-cbind(total=table(credit$A3), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$Debt)) * 100                                                         #
+cbind(total=table(credit$Debt), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Histograma con frecuencias de aparicion                                                             #
 # Estimacion de la fucnion de desidad de probabilidad                                                 #
-dens<-density(credit$A3,na.rm=T)                                                                      #
-hist(credit$A3,xlab="",main="A3",ylim=c(0,max(dens$y)*1.1),probability =T)                            #
+dens<-density(credit$Debt,na.rm=T)                                                                      #
+hist(credit$Debt,xlab="",main="Debt",ylim=c(0,max(dens$y)*1.1),probability =T)                            #
 lines(dens)                                                                                           #
 # rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      #
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           #
 # por si hubiese valores repetidos                                                                    #
-rug(jitter(credit$A3))                                                                                #
+rug(jitter(credit$Debt))                                                                                #
                                                                                                       #
                                                                                                       #
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        #
 # y posibles valores atipicos                                                                         #
-boxplot(credit$A3,main="A3")                                                                          #
+boxplot(credit$Debt,main="Debt")                                                                          #
                                                                                                       #
                                                                                                       #
 # Representacion de los percentiles con respecto a los de una normal centrada en cero                 #
-qqplot.data(credit$A3)+ggtitle("Gráfica Q-Q para A3")                                                 #
+qqplot.data(credit$Debt)+ggtitle("Gráfica Q-Q para Debt")                                                 #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A4############################################################################
+#######Analisis variable Married############################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[4], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A4)) * 100                                                         #
-cbind(total=table(credit$A4), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$Married)) * 100                                                         #
+cbind(total=table(credit$Married), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A4))                                                                             #
+barplot(table(credit$Married))                                                                             #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A5############################################################################
+#######Analisis variable BankCustomer############################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[5], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A5)) * 100                                                         #
-cbind(total=table(credit$A5), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$BankCustomer)) * 100                                                         #
+cbind(total=table(credit$BankCustomer), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A5))                                                                             #
+barplot(table(credit$BankCustomer))                                                                             #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A6############################################################################
+#######Analisis variable EducationLevel############################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[6], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A6)) * 100                                                         #
-cbind(total=table(credit$A6), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$EducationLevel)) * 100                                                         #
+cbind(total=table(credit$EducationLevel), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A6))                                                                             #
+barplot(table(credit$EducationLevel))                                                                             #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A7############################################################################
+#######Analisis variable Ethnicity############################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[7], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A7)) * 100                                                         #
-cbind(total=table(credit$A7), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$Ethnicity)) * 100                                                         #
+cbind(total=table(credit$Ethnicity), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A7))                                                                             #
+barplot(table(credit$Ethnicity))                                                                             #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A8############################################################################
+#######Analisis variable YearsEmployed############################################################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[8], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A8)) * 100                                                         #
-cbind(total=table(credit$A8), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$YearsEmployed)) * 100                                                         #
+cbind(total=table(credit$YearsEmployed), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Histograma con frecuencias de aparicion                                                             #
 # Estimacion de la fucnion de desidad de probabilidad                                                 #
-dens<-density(credit$A8,na.rm=T)                                                                      #
-hist(credit$A8,xlab="",main="A8",ylim=c(0,max(dens$y)*1.1),probability =T)                            #
+dens<-density(credit$YearsEmployed,na.rm=T)                                                                      #
+hist(credit$YearsEmployed,xlab="",main="YearsEmployed",ylim=c(0,max(dens$y)*1.1),probability =T)                            #
 lines(dens)                                                                                           #
 # rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      #
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           #
 # por si hubiese valores repetidos                                                                    #
-rug(jitter(credit$A8))                                                                                #
+rug(jitter(credit$YearsEmployed))                                                                                #
                                                                                                       #
                                                                                                       #
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        #
 # y posibles valores atipicos                                                                         #
-boxplot(credit$A8,main="A8")                                                                          #
+boxplot(credit$YearsEmployed,main="YearsEmployed")                                                                          #
                                                                                                       #
                                                                                                       #
 # Representacion de los percentiles con respecto a los de una normal centrada en cero                 #
-qqplot.data(credit$A8)+ggtitle("Gráfica Q-Q para A8")                                                 #
+qqplot.data(credit$YearsEmployed)+ggtitle("Gráfica Q-Q para YearsEmployed")                                                 #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A9############################################################################
+#######Analisis variable PriorDefaul############################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[9], maxsum = Inf)                                                                      #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A9)) * 100                                                         #
-cbind(total=table(credit$A9), porcentaje=porcent)                                                     #
+porcent <- prop.table(table(credit$PriorDefaul)) * 100                                                         #
+cbind(total=table(credit$PriorDefaul), porcentaje=porcent)                                                     #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A9))                                                                             #
+barplot(table(credit$PriorDefaul))                                                                             #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A10###########################################################################
+#######Analisis variable Employed###########################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[10], maxsum = Inf)                                                                     #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A10)) * 100                                                        #
-cbind(total=table(credit$A10), porcentaje=porcent)                                                    #
+porcent <- prop.table(table(credit$Employed)) * 100                                                        #
+cbind(total=table(credit$Employed), porcentaje=porcent)                                                    #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A10))                                                                            #
+barplot(table(credit$Employed))                                                                            #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A11###########################################################################
+#######Analisis variable CreditScore###########################################################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[11], maxsum = Inf)                                                                     #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A11)) * 100                                                        #
-cbind(total=table(credit$A11), porcentaje=porcent)                                                    #
+porcent <- prop.table(table(credit$CreditScore)) * 100                                                        #
+cbind(total=table(credit$CreditScore), porcentaje=porcent)                                                    #
                                                                                                       #
                                                                                                       #
 # Histograma con frecuencias de aparicion                                                             #
 # Estimacion de la fucnion de desidad de probabilidad                                                 #
-dens<-density(credit$A11,na.rm=T)                                                                     #
-hist(credit$A11,xlab="",main="A11",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
+dens<-density(credit$CreditScore,na.rm=T)                                                                     #
+hist(credit$CreditScore,xlab="",main="CreditScore",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
 lines(dens)                                                                                           #
 # rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      #
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           #
 # por si hubiese valores repetidos                                                                    #
-rug(jitter(credit$A11))                                                                               #
+rug(jitter(credit$CreditScore))                                                                               #
                                                                                                       #
                                                                                                       #
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        #
 # y posibles valores atipicos                                                                         #
-boxplot(credit$A11,main="A11")                                                                        #
+boxplot(credit$CreditScore,main="CreditScore")                                                                        #
                                                                                                       #
                                                                                                       #
 # Representacion de los percentiles con respecto a los de una normal centrada en cero                 #
-qqplot.data(credit$A11)+ggtitle("Gráfica Q-Q para A11")                                               #
+qqplot.data(credit$CreditScore)+ggtitle("Gráfica Q-Q para CreditScore")                                               #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A12###########################################################################
+#######Analisis variable DriversLicense###########################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[12], maxsum = Inf)                                                                     #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A12)) * 100                                                        #
-cbind(total=table(credit$A12), porcentaje=porcent)                                                    #
+porcent <- prop.table(table(credit$DriversLicense)) * 100                                                        #
+cbind(total=table(credit$DriversLicense), porcentaje=porcent)                                                    #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A12))                                                                            #
+barplot(table(credit$DriversLicense))                                                                            #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A13###########################################################################
+#######Analisis variable Citizen###########################################################################
 # Variable Discreta                                                                                   #
 # Resumen                                                                                             #
 summary(credit[13], maxsum = Inf)                                                                     #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A13)) * 100                                                        #
-cbind(total=table(credit$A13), porcentaje=porcent)                                                    #
+porcent <- prop.table(table(credit$Citizen)) * 100                                                        #
+cbind(total=table(credit$Citizen), porcentaje=porcent)                                                    #
                                                                                                       #
                                                                                                       #
 # Grafico de barras                                                                                   #
-barplot(table(credit$A13))                                                                            #
+barplot(table(credit$Citizen))                                                                            #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A14###########################################################################
+#######Analisis variable ZipCode###########################################################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[14], maxsum = Inf)                                                                     #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A14)) * 100                                                        #
-cbind(total=table(credit$A14), porcentaje=porcent)                                                    #
+porcent <- prop.table(table(credit$ZipCode)) * 100                                                        #
+cbind(total=table(credit$ZipCode), porcentaje=porcent)                                                    #
                                                                                                       #
                                                                                                       #
 # Histograma con frecuencias de aparicion                                                             #
 # Estimacion de la fucnion de desidad de probabilidad                                                 #
-dens<-density(credit$A14,na.rm=T)                                                                     #
-hist(credit$A14,xlab="",main="A14",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
+dens<-density(credit$ZipCode,na.rm=T)                                                                     #
+hist(credit$ZipCode,xlab="",main="ZipCode",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
 lines(dens)                                                                                           #
 # rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      #
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           #
 # por si hubiese valores repetidos                                                                    #
-rug(jitter(credit$A14))                                                                               #
+rug(jitter(credit$ZipCode))                                                                               #
                                                                                                       #
                                                                                                       #
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        #
 # y posibles valores atipicos                                                                         #
-boxplot(credit$A14,main="A14")                                                                        #
+boxplot(credit$ZipCode,main="ZipCode")                                                                        #
                                                                                                       #
                                                                                                       #
 # Representacion de los percentiles con respecto a los de una normal centrada en cero                 #
-qqplot.data(credit$A14)+ggtitle("Gráfica Q-Q para A14")                                               #
+qqplot.data(credit$ZipCode)+ggtitle("Gráfica Q-Q para ZipCode")                                               #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 
 
-#######Analisis variable A15###########################################################################
+#######Analisis variable Income###########################################################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[15], maxsum = Inf)                                                                     #
                                                                                                       #
                                                                                                       #
 # Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$A15)) * 100                                                        #
-cbind(total=table(credit$A15), porcentaje=porcent)                                                    #
+porcent <- prop.table(table(credit$Income)) * 100                                                        #
+cbind(total=table(credit$Income), porcentaje=porcent)                                                    #
                                                                                                       #
                                                                                                       #
 # Histograma con frecuencias de aparicion                                                             #
 # Estimacion de la fucnion de desidad de probabilidad                                                 #
-dens<-density(credit$A15,na.rm=T)                                                                     #
-hist(credit$A15,xlab="",main="A15",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
+dens<-density(credit$Income,na.rm=T)                                                                     #
+hist(credit$Income,xlab="",main="Income",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
 lines(dens)                                                                                           #
 # rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      #
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           #
 # por si hubiese valores repetidos                                                                    #
-rug(jitter(credit$A15))                                                                               #
+rug(jitter(credit$Income))                                                                               #
                                                                                                       #
                                                                                                       #
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        #
 # y posibles valores atipicos                                                                         #
-boxplot(credit$A15,main="A15")                                                                        #
+boxplot(credit$Income,main="Income")                                                                        #
                                                                                                       #
                                                                                                       #
 # Representacion de los percentiles con respecto a los de una normal centrada en cero                 #
-qqplot.data(credit$A15)+ggtitle("Gráfica Q-Q para A15")                                               #
+qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income")                                               #
                                                                                                       #
                                                                                                       #
 #######################################################################################################
 ```
 
-Para hacer las multivariables hacer uniones con la variable de clase de salida ( +,-), para ver como influyen. 
+
+
+## Análisis multivariable
+
+Para hacer las multivariables haremos uniones con la variable de clase de salida ( +,-), para ver como influyen. 
+
+```{r}
+pairs(creadit[1:4],col=as.numeric(iris$clase))
+
+
+```
+
+
+
 
 ## Tratar valores nulos/externos/atípicos/desconocidos si los hubiese
 
