@@ -555,7 +555,7 @@ Cuando una variable tiene poca varianza indica que carece de mucha informacion p
 
 Vemos si existe alguna variable con esta caracteristica
 ```{r}
-nearZeroVar(credit.fix)
+nearZeroVar(credit.Datos.Train)
 ```
 
 Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como esta.
