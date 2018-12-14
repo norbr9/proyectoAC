@@ -168,7 +168,7 @@ qqplot.data(credit$Debt)+ggtitle("Gráfica Q-Q para Debt")                      
 
 
 #######Analisis variable Married############################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[4], maxsum = Inf)                                                                      #
                                                                                                       #
@@ -186,7 +186,7 @@ barplot(table(credit$Married))                                                  
 
 
 #######Analisis variable BankCustomer############################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[5], maxsum = Inf)                                                                      #
                                                                                                       #
@@ -204,7 +204,7 @@ barplot(table(credit$BankCustomer))                                             
 
 
 #######Analisis variable EducationLevel############################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[6], maxsum = Inf)                                                                      #
                                                                                                       #
@@ -222,7 +222,7 @@ barplot(table(credit$EducationLevel))                                           
 
 
 #######Analisis variable Ethnicity############################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[7], maxsum = Inf)                                                                      #
                                                                                                       #
@@ -274,7 +274,7 @@ qqplot.data(credit$YearsEmployed)+ggtitle("Gráfica Q-Q para YearsEmployed")    
 
 
 #######Analisis variable PriorDefaul############################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[9], maxsum = Inf)                                                                      #
                                                                                                       #
@@ -292,7 +292,7 @@ barplot(table(credit$PriorDefaul))                                              
 
 
 #######Analisis variable Employed###########################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[10], maxsum = Inf)                                                                     #
                                                                                                       #
@@ -344,7 +344,7 @@ qqplot.data(credit$CreditScore)+ggtitle("Gráfica Q-Q para CreditScore")        
 
 
 #######Analisis variable DriversLicense###########################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[12], maxsum = Inf)                                                                     #
                                                                                                       #
@@ -362,7 +362,7 @@ barplot(table(credit$DriversLicense))                                           
 
 
 #######Analisis variable Citizen###########################################################################
-# Variable Discreta                                                                                   #
+# Variable No Numérica                                                                                   #
 # Resumen                                                                                             #
 summary(credit[13], maxsum = Inf)                                                                     #
                                                                                                       #
@@ -447,21 +447,26 @@ qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income")                  
 #######################################################################################################
 ```
 
-## Analizar las variables (multivariable)
-```{r}
-```
 
-
-
-
-
-## Análisis multivariable
+### Análisis multivariable
 
 Para hacer las multivariables haremos uniones con la variable de clase de salida ( +,-), para ver como influyen. 
 
 ```{r}
-pairs(creadit[1:4],col=as.numeric(iris$clase))
+#pairs(credit[,2],col=as.numeric(credit$class))
+#pairs(credit,credit$class)
+#featurePlot(x=iris[,1:4],y=iris[,5],plot="ellipse")
+featurePlot(x=credit[,2],y=credit[,16],plot="density")
+###Variable Male table(credit$Male)
 
+
+y = credit[16]
+#Variable Age
+featurePlot(x=credit[,2],y=credit[,16],plot="density")
+##pairs(credit[,1],col=as.factor(credit$Class))
+
+#Variable Debt
+featurePlot(x=credit[,3],y=credit[,16],plot="density")
 
 ```
 
