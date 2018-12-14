@@ -550,8 +550,35 @@ nearZeroVar(credit.fix)
 
 Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como esta.
 
+### Eliminar variables correladas
+
+Cuando dos variables están muy correladas entre ellas basicamente representan la misma información. SUele ser interesante eliminar una de dichas variables y simplificar el modelo al tener menos variables de entrada.
+
+Vemos si existen variables de este tipo:
+```{r}
+# Seleccionamos las variables de entrada
+datos.input<-credit.fix[,1:15]
+# Obtenemos la correlaci ́on solo de las variables num ́ericas de las variables de entrada
+datos.cor<-cor(na.omit(datos.input[,sapply(datos.input,FUN=is.numeric)]))
+# Obtenemos los nombres de las columnas num ́ericas de entrada correladas
+colsToRemove<-labels(datos.cor)[[1]][findCorrelation(datos.cor,cutoff=0.85)]
+# Eliminamos las columnas correladas del conjunto completo
+credit.nocorr<-credit.fix[setdiff(names(credit.fix),colsToRemove)]
+```
+
+Comprobamos si el dataset de entrada y el de nocorr son diferentes
+
+```{r}
+identical(credit.nocorr,credit.fix)
+```
+No hay ninguna variable correlada por lo que no se puede eliminar nada.
 
 
+#### Crear Dummy Variables
+Las Variables Dummy es una forma de transformar factores en un conjunto de variables num ́ericas dondecada nivel es ortogonal al resto de variables dummy para ese factor.
+as variables dummy son necesarias en algunos modelos matem ́aticos que trabajan con la matrizde atributos y valores de entrada.
+
+Como caret transforma por defecto las variables de entrada que son factores creando dummy variables no haremos esta transformación de forma manual.
 
 
 ## Transformar justificadamente los datos (normalizar/escalar/etc)
