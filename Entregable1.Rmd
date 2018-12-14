@@ -26,7 +26,7 @@ library(lattice)
 library(caret)
 
 credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",", na.strings = "?", header = F)
-colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLevel","Ethnicity","YearsEmployed","PriorDefaul","Employed","CreditScore","DriversLicense","Citizen","ZipCode","Income","Class")
+colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLevel","Ethnicity","YearsEmployed","PriorDefaul","Employed","CreditScore","DriversLicense","Citizen","ZipCode","Income","Approved")
 
 # Informacion de los atributos. Columnas
 # Male:	b, a. 
@@ -44,7 +44,7 @@ colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLev
 # Citizen:	g, p, s. 
 # ZipCode:	continuous. 
 # Income:	continuous. 
-# Class: +,- (class attribute)
+# Approved: +,- (Approved attribute)
 
 
 
@@ -79,39 +79,34 @@ qqplot.data <- function (vec)                                                   
 
 summary(credit)
 
-#######Analisis variable Male############################################################################
+#######Analisis variable Male #######################
 # Variable No Numérica                                                                                
 # Resumen                                                                                             #
-summary(credit[1], maxsum = Inf)                                                                      #
-                                                                                                      #
-                                                                                                      #
-# Numero de ocurrencias (porcentaje)                                                                  #
-porcent <- prop.table(table(credit$Male)) * 100                                                         #
-cbind(total=table(credit$EducationLevel), porcentaje=porcent)                                                     #
-                                                                                                      #
-                                                                                                      #
+summary(credit[1], maxsum = Inf)                                                                      #   
+# Numero de ocurrencias (porcentaje)                                              
+
+porcent <- prop.table(table(credit$Male)) * 100
+
+cbind(total=table(credit$Male), porcentaje=porcent) 
+
 # Grafico de barras                                                                                   #
-barplot(table(credit$Male))                                                                             #
-                                                                                                      #
-                                                                                                      #
-#######################################################################################################
+barplot(table(credit$Male))                                                                          
+####################################
 ```
 
 
 ```{r setup, include=FALSE}
-#######Analisis variable Age############################################################################
+#######Analisis variable Age ######################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
-summary(credit[2], maxsum = Inf)                                                                      #
-                                                                                                      #
-                                                                                                      #
+summary(credit[2], maxsum = Inf)                                                                                                                                                               #
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$Age)) * 100                                                         #
-cbind(total=table(credit$Age), porcentaje=porcent)                                                     #
-                                                                                                      #
-                                                                                                      #
-# Histograma con frecuencias de aparicion                                                             #
-# Estimacion de la fucnion de desidad de probabilidad                                                 #
+cbind(total=table(credit$Age), porcentaje=porcent)                                                                                                                                             #
+# Histograma con frecuencias de aparicion
+
+
+# Estimacion de la fucnión de desidad de probabilidad                                                 #
 dens<-density(credit$Age,na.rm=T)                                                                      #
 hist(credit$Age,xlab="",main="Age",ylim=c(0,max(dens$y)*1.1),probability =T)                            #
 lines(dens)                                                                                           #
@@ -130,10 +125,11 @@ boxplot(credit$Age,main="Age")                                                  
 qqplot.data(credit$Age)+ggtitle("Gráfica Q-Q para Age")                                                 #
                                                                                                       #
                                                                                                       #
-#######################################################################################################
+#####################################
+```
 
-
-#######Analisis variable Debt############################################################################
+```{r}
+#######Analisis variable Debt################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[3], maxsum = Inf)                                                                      #
@@ -453,8 +449,8 @@ qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income")                  
 Para hacer las multivariables haremos uniones con la variable de clase de salida ( +,-), para ver como influyen. 
 
 ```{r}
-#pairs(credit[,2],col=as.numeric(credit$class))
-#pairs(credit,credit$class)
+#pairs(credit[,2],col=as.numeric(credit$Approved))
+#pairs(credit,credit$Approved)
 #featurePlot(x=iris[,1:4],y=iris[,5],plot="ellipse")
 featurePlot(x=credit[,2],y=credit[,16],plot="density")
 ###Variable Male table(credit$Male)
@@ -463,7 +459,7 @@ featurePlot(x=credit[,2],y=credit[,16],plot="density")
 y = credit[16]
 #Variable Age
 featurePlot(x=credit[,2],y=credit[,16],plot="density")
-##pairs(credit[,1],col=as.factor(credit$Class))
+##pairs(credit[,1],col=as.factor(credit$Approved))
 
 #Variable Debt
 featurePlot(x=credit[,3],y=credit[,16],plot="density")
