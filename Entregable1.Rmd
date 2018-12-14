@@ -537,8 +537,20 @@ for(i in 1:15){
 ```
 
 
-
 ## Eliminar variables superfluas/añadir variables nuevas
+
+### Eliminar variables con poca varianza
+Vamos a intentar eliminar variables con poca varianza.
+Cuando una variable tiene poca varianza indica que carece de mucha informacion para crear distinciones entre los datos. Esto puede generar problemas a muchos algoritmos de machine learning
+
+Vemos si existe alguna variable con esta caracteristica
+```{r}
+nearZeroVar(credit.fix)
+```
+
+Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como esta.
+
+
 
 
 
