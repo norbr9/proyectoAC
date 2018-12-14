@@ -44,7 +44,7 @@ colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLev
 # Citizen:	g, p, s. 
 # ZipCode:	continuous. 
 # Income:	continuous. 
-# Approved: +,- (Approved attribute)
+# Approved: +,- (Si ha sido aprobado)
 
 
 
