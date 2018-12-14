@@ -581,7 +581,28 @@ as variables dummy son necesarias en algunos modelos matem ́aticos que trabajan
 Como caret transforma por defecto las variables de entrada que son factores creando dummy variables no haremos esta transformación de forma manual.
 
 
+### Crear nuevas variables
+```{r}
+#Ejemplo de crear nuevas variables con Class Distribution
+credit.fix.preProc.ClssDtrb.Mod<-classDist(credit.fix[,2:3],as.numeric(credit.fix[,16]))
+# A~nadimos las nuevas variables
+credit.fix.xtra.Vars<-cbind(credit.fix,predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,2:3]))
+# Dibujamos las nuevas variables y las antiguas
+p1<-featurePlot(x=predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,1:15]),
+                credit.fix[,16],plot="ellipse")
+p2<-featurePlot(x=credit.fix[,1:15],credit.fix[,16],plot="ellipse")
+print(p1,position=c(0,0,0.5,1),more=T)
+print(p2,position=c(0.5,0,1,1))
+```
+
+
+
+
+
 ## Transformar justificadamente los datos (normalizar/escalar/etc)
+
+## Escalado
+
 
 
 
