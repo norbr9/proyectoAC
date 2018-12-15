@@ -598,7 +598,7 @@ Como caret transforma por defecto las variables de entrada que son factores crea
 
 ## Transformar justificadamente los datos (normalizar/escalar/etc)
 
-## Escalado
+### Escalado
 El cambio de escala se aplica a las variables para normalizarlas y ponerlas todas en una escala común. Esto se hace tanto para mejorar la comprensión sobre su distribución y poder compararlas más facilmente evitándo la distorsión de diferencia de escalas como por el hecho de que de esta manera se evitan problemas con los algoritmos de ajuste de modelos que no posean la propiedad de invarianza al escalado como, por ejemplo, los algoritmos basados en gradiente descente (como las redes neuronales que usen backpropagation).
 
 
@@ -638,6 +638,7 @@ d2<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
   data=credit.Datos.Train.Transf.CS, main="Variables Normalizadas",plot.points=F)
 # Gráficos en blanco y negro (mejor para imprimir)
+#HACER QUE LA GRÁFICA SIN NORMALIZAR SE VEA MEJOR
 trellis.par.set(theme = standard.theme("pdf",color=FALSE))
 print(d1,position=c(0,0,0.5,1),more=T)
 print(d2,position=c(0.5,0,1,1))
@@ -645,9 +646,41 @@ print(d2,position=c(0.5,0,1,1))
 trellis.par.set(theme = standard.theme("pdf"))
 ```
 
+HACER QUE LA GRÁFICA SIN NORMALIZAR SE VEA MEJOR
 
-##Transformaciones de relaciones entre variables
+###Transformaciones de relaciones entre variables
 
+No es necesario, ya que cuando hicimos el estudio para eliminar variables correladas comprobamos que no existían.
+
+##Transformaciones de distribuciones asimétricas
+
+Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson porque necesitamos que se puedan tratar valores negativos.
+
+
+```{r}
+
+credit.preProc.CS.Mod.YJ<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "YeoJohnson"))
+
+# Obtenemos la transformación
+credit.Datos.Train.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Train)
+credit.Datos.Test.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Test)
+
+
+d1<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F)
+
+d3<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train.Transf.CS.YJ, main="Variables Aplicado YJ",plot.points=F)
+
+trellis.par.set(theme = standard.theme("pdf",color=FALSE))
+print(d1,position=c(0,0,0.5,1),more=T)
+print(d3,position=c(0.5,0,1,1))
+# Volvemos a gráficos normales
+trellis.par.set(theme = standard.theme("pdf"))
+
+```
 
 
 
