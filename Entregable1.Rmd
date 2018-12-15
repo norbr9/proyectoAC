@@ -12,7 +12,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-````{r,eval=FALSE}
+```{r}
 ##para que no se ejecuten el cacho de código
 library(ggplot2)
 library(lattice)
@@ -20,8 +20,11 @@ library(caret)
 library(e1071)
 library(ellipse)
 library(doParallel)
+library(rpart)
 
-````
+```
+
+Primero cargaremos las librerías necearias para la ejecución de las funciones que necesitaremos.
 
 # Carga de la base de datos
 
@@ -670,26 +673,6 @@ No es necesario, ya que cuando hicimos el estudio para eliminar variables correl
 Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson porque necesitamos que se puedan tratar valores negativos.
 
 
-````{r,eval=FALSE}
-##para que no se ejecuten el cacho de código
-library(ggplot2)
-library(lattice)
-library(caret)
-
-rm(credit.preProc.CS.Mod.YJ)
-rm(credit.Datos.Train.Transf.CS.YJ)
-rm(credit.Datos.Test.Transf.CS.YJ)
-
-rm(credit.preProc.CS.Mod.XT)
-rm(credit.Datos.Train.Transf.CS.XT)
-rm(credit.Datos.Test.Transf.CS.XT)
-
-rm(credit.preProc.CS.Mod.BC)
-rm(credit.Datos.Train.Transf.CS.BC)
-rm(credit.Datos.Test.Transf.CS.BC)
-
-````
-
 ```{r, warning=FALSE}
 
 credit.preProc.CS.Mod.BC<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "BoxCox"))
@@ -783,6 +766,8 @@ credit.TrainCtrl.3cv10.plRF <- trainControl(method='repeatedcv', number = 10, re
 El algoritmo CART de árboles de decisión de clasificación y regresión
 
 ```{r}
+
+
 
 ```
 
