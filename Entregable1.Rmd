@@ -409,7 +409,7 @@ qqplot.data(credit$ZipCode)+ggtitle("Gráfica Q-Q para ZipCode")                
 #######################################################################################################
 
 
-#######Analisis variable Income###########################################################################
+#######Analisis variable Income##########################################################
 # Variable Continua                                                                                   #
 # Resumen                                                                                             #
 summary(credit[15], maxsum = Inf)                                                                     #
@@ -446,7 +446,9 @@ qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income")                  
 
 ### Análisis multivariable
 
-Para hacer las multivariables haremos uniones con la variable de clase de salida ( +,-), para ver como influyen. 
+Para hacer las multivariables haremos uniones con la variable de clase [de salida ( +,-)], para ver como influyen. 
+
+Calcularemos el coeficiente de correlación, matriz de correlación para poder comprender mejor lo que ocurre con el análisis 
 
 ```{r}
 #pairs(credit[,2],col=as.numeric(credit$Approved))
@@ -585,7 +587,7 @@ Como caret transforma por defecto las variables de entrada que son factores crea
 ```{r}
 #Ejemplo de crear nuevas variables con Class Distribution
 credit.fix.preProc.ClssDtrb.Mod<-classDist(credit.fix[,2:3],as.numeric(credit.fix[,16]))
-# A~nadimos las nuevas variables
+# Añadimos las nuevas variables
 credit.fix.xtra.Vars<-cbind(credit.fix,predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,2:3]))
 # Dibujamos las nuevas variables y las antiguas
 p1<-featurePlot(x=predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,1:15]),
