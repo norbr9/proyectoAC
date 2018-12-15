@@ -727,9 +727,9 @@ credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.BC,predict(credit.preProc.C
 credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.BC,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Test.Transf.CS.BC[credit.Vars.Entrada.Escaladas]))
 
 # Dibujamos las nuevas variables y las antiguas
-p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas]), credit.Datos.Train.Transf.CS.BC[,15],plot="pairs")
+p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas]), credit.Datos.Train.Transf.CS.BC[,15],plot="ellipse")
 
-p2<-featurePlot(x=credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas], credit.Datos.Train.Transf.CS.BC[,15],plot="pairs")
+p2<-featurePlot(x=credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas], credit.Datos.Train.Transf.CS.BC[,15],plot="ellipse")
 
 print(p1,position=c(0,0,0.5,1),more=T)
 print(p2,position=c(0.5,0,1,1))
