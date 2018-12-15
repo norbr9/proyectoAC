@@ -628,7 +628,7 @@ credit.Datos.Test.Transf.CS<-predict(credit.preProc.CS.Mod,credit.Datos.Test)
 
 
 Ahora podemos ver el efecto del escalado sobre las variables de entrada y comprobamos que estas estén en la misma escala y estén centradas.
-```{r}
+```{r, warning=FALSE}
 # Dibujar un diagrama de densidad para las variables que han sido escaladas
 VarToPlot<-credit.Vars.Entrada.Escaladas
 d1<-densityplot(
@@ -657,7 +657,7 @@ No es necesario, ya que cuando hicimos el estudio para eliminar variables correl
 Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson porque necesitamos que se puedan tratar valores negativos.
 
 
-```{r}
+```{r, warning=FALSE}
 
 credit.preProc.CS.Mod.YJ<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "YeoJohnson"))
 
@@ -682,7 +682,7 @@ trellis.par.set(theme = standard.theme("pdf"))
 
 ```
 
-
+##
 
 ### Crear nuevas variables
 ```{r}
