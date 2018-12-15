@@ -14,6 +14,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ````{r,eval=FALSE}
 ##para que no se ejecuten el cacho de código
+library(ggplot2)
+library(lattice)
+library(caret)
 
 ````
 
@@ -21,9 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r setup, include=FALSE}
 #Carga de librerías necesarias
-library(ggplot2)
-library(lattice)
-library(caret)
+
 
 credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",", na.strings = "?", header = F)
 colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLevel","Ethnicity","YearsEmployed","PriorDefaul","Employed","CreditScore","DriversLicense","Citizen","ZipCode","Income","Approved")
@@ -487,7 +488,7 @@ No es recomendable deshacernos de los nulos sin más, ademas no hay ningun ejemp
 
 
 #### Sustitución mediante valores representativos
-Como la muestra tiene una distribucion desplazada skewed para TODAS las variables continuas, la mediana es la mejor opcion como valor central para sustituir.
+Como la muestra tiene una distribucion desplazada skewed para todas las variables continuas, la mediana es la mejor opcion como valor central para sustituir.
 
 Para las variables no continuas sustituiremos los valores nulos por el valor que mas se repita
 
@@ -533,8 +534,7 @@ for(i in 1:15){
 
 
 ## Dividir datos en Train/Test
-Ahora que se han pre-procesado los datos parcialmente (Tratando los outliners y nulos) se debe separar el dataset
-en dos conjuntos
+Ahora que se han pre-procesado los datos parcialmente (Tratando los outliners y nulos) se debe separar el dataset en dos conjuntos
 
 ```{r}
 credit.trainIdx<-readRDS("credit.trainIdx.rds")
@@ -564,13 +564,13 @@ Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como esta.
 
 ### Eliminar variables correladas
 
-Cuando dos variables están muy correladas entre ellas basicamente representan la misma información. SUele ser interesante eliminar una de dichas variables y simplificar el modelo al tener menos variables de entrada.
+Cuando dos variables están muy correladas entre ellas basicamente representan la misma información. Suele ser interesante eliminar una de dichas variables y simplificar el modelo al tener menos variables de entrada.
 
 Vemos si existen variables de este tipo:
 ```{r}
 # Seleccionamos las variables de entrada
 datos.input<-credit.Datos.Train[,1:15]
-# Obtenemos la correlaci ́on solo de las variables num ́ericas de las variables de entrada
+# Obtenemos la correlación solo de las variables numéricas de las variables de entrada
 datos.cor<-cor(na.omit(datos.input[,sapply(datos.input,FUN=is.numeric)]))
 # Obtenemos los nombres de las columnas num ́ericas de entrada correladas
 colsToRemove<-labels(datos.cor)[[1]][findCorrelation(datos.cor,cutoff=0.85)]
@@ -593,50 +593,28 @@ as variables dummy son necesarias en algunos modelos matem ́aticos que trabajan
 Como caret transforma por defecto las variables de entrada que son factores creando dummy variables no haremos esta transformación de forma manual.
 
 
-### Crear nuevas variables
-```{r}
-#Ejemplo de crear nuevas variables con Class Distribution
-credit.fix.preProc.ClssDtrb.Mod<-classDist(credit.fix[,2:3],as.numeric(credit.fix[,16]))
-# Añadimos las nuevas variables
-credit.fix.xtra.Vars<-cbind(credit.fix,predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,2:3]))
-# Dibujamos las nuevas variables y las antiguas
-p1<-featurePlot(x=predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,1:15]),
-                credit.fix[,16],plot="ellipse")
-p2<-featurePlot(x=credit.fix[,1:15],credit.fix[,16],plot="ellipse")
-print(p1,position=c(0,0,0.5,1),more=T)
-print(p2,position=c(0.5,0,1,1))
-```
-
-
 
 
 
 ## Transformar justificadamente los datos (normalizar/escalar/etc)
 
 ## Escalado
-El cambio de escala se aplica a las variables para normalizarlas y ponerlas todas en una escala común. Esto se
-hace tanto para mejorar la comprensión sobre su distribución y poder compararlas más facilmente evitándo
-la distorsión de diferencia de escalas como por el hecho de que de esta manera se evitan problemas con los
-algoritmos de ajuste de modelos que no posean la propiedad de invarianza al escalado como, por ejemplo,
-los algoritmos basados en gradiente descente (como las redes neuronales que usen backpropagation).
+El cambio de escala se aplica a las variables para normalizarlas y ponerlas todas en una escala común. Esto se hace tanto para mejorar la comprensión sobre su distribución y poder compararlas más facilmente evitándo la distorsión de diferencia de escalas como por el hecho de que de esta manera se evitan problemas con los algoritmos de ajuste de modelos que no posean la propiedad de invarianza al escalado como, por ejemplo, los algoritmos basados en gradiente descente (como las redes neuronales que usen backpropagation).
 
 
 ```{r}
 # Semilla de números aleatorios
-set.seed(1234)
+#set.seed(1234) -> no necesario, Eso lo usas cuando quieres que se pueda repetir el experimento tal cual lo has hecho, Escalar el conjunto de datos siempre lo va a hacer igual
 
 # Dataset a utilizar. Sus variables de entrada y salida.
-credit.Vars.Salida<-c("Approved")
-credit.Vars.Entrada<-c("Age","YearsEmployed","CreditScore","ZipCode","Income");
-
 # Variable a predecir, variables de entrada a usar y variables que se escalarán.
 credit.Var.Salida.Usada<-c("Approved")
-credit.Vars.Entrada.Usadas<-credit.Vars.Entrada
-
+credit.Vars.Entrada.Usadas<-c("Age", "Debt", "YearsEmployed","CreditScore","ZipCode","Income")
 # Por si algunas se ignoran
 credit.Vars.Entrada.Escaladas<-credit.Vars.Entrada.Usadas # Vars a escalar
-credit.Datos.Usados<-cbind(credit.Datos.Train[credit.Vars.Entrada.Usadas],
-credit.Datos.Train[credit.Var.Salida.Usada])
+
+#variable no necesaria
+#credit.Datos.Usados<-cbind(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[credit.Var.Salida.Usada])
 
 # Solo indicamos las variables que vayamos a transformar (y usamos TRAIN)
 credit.preProc.CS.Mod<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas],
@@ -644,16 +622,15 @@ credit.preProc.CS.Mod<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escalad
 
 # Obtenemos la transformación
 credit.Datos.Train.Transf.CS<-predict(credit.preProc.CS.Mod,credit.Datos.Train)
-
+credit.Datos.Test.Transf.CS<-predict(credit.preProc.CS.Mod,credit.Datos.Test)
 
 ```
 
 
-Ahora podemos ver el efecto del escalado sobre las variables de entrada y comprobamos que estas estén
-en la misma escala y estén centradas.
+Ahora podemos ver el efecto del escalado sobre las variables de entrada y comprobamos que estas estén en la misma escala y estén centradas.
 ```{r}
 # Dibujar un diagrama de densidad para las variables que han sido escaladas
-VarToPlot<-credit.Vars.Entrada
+VarToPlot<-credit.Vars.Entrada.Escaladas
 d1<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
   data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F)
@@ -669,6 +646,24 @@ trellis.par.set(theme = standard.theme("pdf"))
 ```
 
 
+##Transformaciones de relaciones entre variables
+
+
+
+
+### Crear nuevas variables
+```{r}
+#Ejemplo de crear nuevas variables con Class Distribution
+credit.fix.preProc.ClssDtrb.Mod<-classDist(credit.fix[,2:3],as.numeric(credit.fix[,16]))
+# Añadimos las nuevas variables
+credit.fix.xtra.Vars<-cbind(credit.fix,predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,2:3]))
+# Dibujamos las nuevas variables y las antiguas
+p1<-featurePlot(x=predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,1:15]),
+                credit.fix[,16],plot="ellipse")
+p2<-featurePlot(x=credit.fix[,1:15],credit.fix[,16],plot="ellipse")
+print(p1,position=c(0,0,0.5,1),more=T)
+print(p2,position=c(0.5,0,1,1))
+```
 
 
 
