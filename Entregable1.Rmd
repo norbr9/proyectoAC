@@ -667,13 +667,33 @@ No es necesario, ya que cuando hicimos el estudio para eliminar variables correl
 Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson porque necesitamos que se puedan tratar valores negativos.
 
 
+````{r,eval=FALSE}
+##para que no se ejecuten el cacho de código
+library(ggplot2)
+library(lattice)
+library(caret)
+
+rm(credit.preProc.CS.Mod.YJ)
+rm(credit.Datos.Train.Transf.CS.YJ)
+rm(credit.Datos.Test.Transf.CS.YJ)
+
+rm(credit.preProc.CS.Mod.XT)
+rm(credit.Datos.Train.Transf.CS.XT)
+rm(credit.Datos.Test.Transf.CS.XT)
+
+rm(credit.preProc.CS.Mod.BC)
+rm(credit.Datos.Train.Transf.CS.BC)
+rm(credit.Datos.Test.Transf.CS.BC)
+
+````
+
 ```{r, warning=FALSE}
 
-credit.preProc.CS.Mod.YJ<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "YeoJohnson"))
+credit.preProc.CS.Mod.BC<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "BoxCox"))
 
 # Obtenemos la transformación
-credit.Datos.Train.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Train)
-credit.Datos.Test.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Test)
+credit.Datos.Train.Transf.CS.BC<-predict(credit.preProc.CS.Mod.BC,credit.Datos.Train)
+credit.Datos.Test.Transf.CS.BC<-predict(credit.preProc.CS.Mod.BC,credit.Datos.Test)
 
 
 d1<-densityplot(
@@ -682,7 +702,7 @@ d1<-densityplot(
 
 d3<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train.Transf.CS.YJ, main="Variables Aplicado YJ",plot.points=F)
+  data=credit.Datos.Train.Transf.CS.BC, main="Variables Aplicado BC",plot.points=F)
 
 trellis.par.set(theme = standard.theme("pdf",color=FALSE))
 print(d1,position=c(0,0,0.5,1),more=T)
@@ -692,20 +712,25 @@ trellis.par.set(theme = standard.theme("pdf"))
 
 ```
 
+
 Como no queremos perder información que puede ser relevante no vamos a aplicar las técnicas de Binning ni Bloqueo.
 
 
 
-### Crear nuevas variables (creo que podemos obviarlo, no lo veo necesario)
-```{r}
-#Ejemplo de crear nuevas variables con Class Distribution
-credit.fix.preProc.ClssDtrb.Mod<-classDist(credit.fix[,2:3],as.numeric(credit.fix[,16]))
-# Añadimos las nuevas variables
-credit.fix.xtra.Vars<-cbind(credit.fix,predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,2:3]))
+### Crear nuevas variables
+
+```{r, warning=FALSE}
+# Ejemplo de crear nuevas variables con Class Distribution
+credit.preProc.ClssDtrb.Mod<-classDist(credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas],credit.Datos.Train.Transf.CS.BC[,15])
+# A~nadimos las nuevas variables
+credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.BC,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas]))
+credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.BC,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Test.Transf.CS.BC[credit.Vars.Entrada.Escaladas]))
+
 # Dibujamos las nuevas variables y las antiguas
-p1<-featurePlot(x=predict(credit.fix.preProc.ClssDtrb.Mod,credit.fix[,1:15]),
-                credit.fix[,16],plot="ellipse")
-p2<-featurePlot(x=credit.fix[,1:15],credit.fix[,16],plot="ellipse")
+p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas]), credit.Datos.Train.Transf.CS.BC[,15],plot="pairs")
+
+p2<-featurePlot(x=credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas], credit.Datos.Train.Transf.CS.BC[,15],plot="pairs")
+
 print(p1,position=c(0,0,0.5,1),more=T)
 print(p2,position=c(0.5,0,1,1))
 ```
