@@ -40,11 +40,11 @@ colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLev
 # YearsEmployed:	continuous. 
 # PriorDefaul:	t, f. 
 # Employed:	t, f. 
-# CreditScore:	continuous. 
+# CreditScore: continuous. 
 # DriversLicense:	t, f. 
-# Citizen:	g, p, s. 
-# ZipCode:	continuous. 
-# Income:	continuous. 
+# Citizen: g, p, s. 
+# ZipCode: continuous. 
+# Income: continuous. 
 # Approved: +,- (Si ha sido aprobado)
 
 ```
@@ -437,6 +437,16 @@ qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income")                  
 ```
 
 
+Se eliminará la variable ZipCode por no tener información relevante que sirva para el resto del análisis.
+
+```{r}
+
+credit.Datos<-credit
+credit.Datos$ZipCode<-NULL
+
+```
+
+
 ### Análisis multivariable
 
 Para hacer las multivariables haremos uniones con la variable de clase [de salida ( +,-)], para ver como influyen. 
@@ -471,18 +481,18 @@ Para tomar medida de cuán serio es el problema de los valores nulos, debemos co
 # Tratamiento de valores nulos
 
 # Elementos que queremos tratar
-tibble::rowid_to_column(credit)[!complete.cases(credit),]
+tibble::rowid_to_column(credit.Datos)[!complete.cases(credit.Datos),]
 
 # Numero de filas con nulos
 print("Numero de filas con valores nulos")
-nrow(credit[!complete.cases(credit),])
+nrow(credit.Datos[!complete.cases(credit.Datos),])
 
 # Porcentaje de valores nulos
 print("Porcentaje de filas con valores nulos")
-nrow(credit[!complete.cases(credit),])/nrow(credit)*100
+nrow(credit.Datos[!complete.cases(credit.Datos),])/nrow(credit.Datos)*100
 
 ```
-Como vemos tenemos 37 filas con valores filas con valores nulos, lo  que supone un 5,362319% de casos.
+Como vemos tenemos 31 filas con valores filas con valores nulos, lo  que supone un 4,5% de casos.
 
 No es recomendable deshacernos de los nulos sin más, ademas no hay ningun ejemplar que tenga muchas variables con valores nulos, por lo tanto la solucion seriá sustituirlas mediante valores representativos.
 
@@ -495,17 +505,17 @@ Para las variables no continuas sustituiremos los valores nulos por el valor que
 
 ```{r}
 # Tratamiento de las variables en funcion de si es continua o no continua
-credit.fix<-credit
-continua<-c(FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,TRUE)
+credit.fix<-credit.Datos
+continua<-c(FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE)
 
-for(i in 1:15){
+for(i in 1:14){
   if(continua[i]){
-    nulos <- subset(credit.fix, is.na(credit.fix[,i]))
+    nulos <- subset(credit.fix, is.na(credit.fix[,i])) 
     credit.fix[as.numeric(rownames(nulos)), i] <-median(credit.fix[[i]],na.rm=T)
     
   } else {
-    valorMasRepetido<-tail(names(sort(table(credit[i]))), 1)
-    nulos <- subset(credit.fix, is.na(credit.fix[,i]))
+    valorMasRepetido<-tail(names(sort(table(credit.Datos[i]))), 1) 
+    nulos <- subset(credit.fix, is.na(credit.fix[,i])) 
     credit.fix[as.numeric(rownames(nulos)), i] <- valorMasRepetido
   }
 }
@@ -521,7 +531,7 @@ nrow(credit[!complete.cases(credit.fix),])/nrow(credit.fix)*100
 ### Tratamiento de valores extremos/atipicos
 Sustitucion de los valores extremos y atipicos por la mediana de la variable en cuestion
 ```{r}
-for(i in 1:15){
+for(i in 1:14){
   if(!continua[i]) next;
   
   extremos<-boxplot(credit.fix[i],boxwex=0.15,plot=F)$out
@@ -569,7 +579,7 @@ Cuando dos variables están muy correladas entre ellas basicamente representan l
 Vemos si existen variables de este tipo:
 ```{r}
 # Seleccionamos las variables de entrada
-datos.input<-credit.Datos.Train[,1:15]
+datos.input<-credit.Datos.Train[,1:14]
 # Obtenemos la correlación solo de las variables numéricas de las variables de entrada
 datos.cor<-cor(na.omit(datos.input[,sapply(datos.input,FUN=is.numeric)]))
 # Obtenemos los nombres de las columnas num ́ericas de entrada correladas
@@ -596,7 +606,7 @@ Como caret transforma por defecto las variables de entrada que son factores crea
 
 
 
-## Transformar justificadamente los datos (normalizar/escalar/etc)
+## Transformar los datos
 
 ### Escalado
 El cambio de escala se aplica a las variables para normalizarlas y ponerlas todas en una escala común. Esto se hace tanto para mejorar la comprensión sobre su distribución y poder compararlas más facilmente evitándo la distorsión de diferencia de escalas como por el hecho de que de esta manera se evitan problemas con los algoritmos de ajuste de modelos que no posean la propiedad de invarianza al escalado como, por ejemplo, los algoritmos basados en gradiente descente (como las redes neuronales que usen backpropagation).
@@ -609,7 +619,7 @@ El cambio de escala se aplica a las variables para normalizarlas y ponerlas toda
 # Dataset a utilizar. Sus variables de entrada y salida.
 # Variable a predecir, variables de entrada a usar y variables que se escalarán.
 credit.Var.Salida.Usada<-c("Approved")
-credit.Vars.Entrada.Usadas<-c("Age", "Debt", "YearsEmployed","CreditScore","ZipCode","Income")
+credit.Vars.Entrada.Usadas<-c("Age", "Debt", "YearsEmployed","CreditScore", "Income")
 # Por si algunas se ignoran
 credit.Vars.Entrada.Escaladas<-credit.Vars.Entrada.Usadas # Vars a escalar
 
@@ -648,11 +658,11 @@ trellis.par.set(theme = standard.theme("pdf"))
 
 HACER QUE LA GRÁFICA SIN NORMALIZAR SE VEA MEJOR
 
-###Transformaciones de relaciones entre variables
+###Transformaciones de relaciones entre variables (quizás esto incluso sobra ponerlo)
 
 No es necesario, ya que cuando hicimos el estudio para eliminar variables correladas comprobamos que no existían.
 
-##Transformaciones de distribuciones asimétricas
+###Transformaciones de distribuciones asimétricas
 
 Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson porque necesitamos que se puedan tratar valores negativos.
 
@@ -682,9 +692,11 @@ trellis.par.set(theme = standard.theme("pdf"))
 
 ```
 
-##
+Como no queremos perder información que puede ser relevante no vamos a aplicar las técnicas de Binning ni Bloqueo.
 
-### Crear nuevas variables
+
+
+### Crear nuevas variables (creo que podemos obviarlo, no lo veo necesario)
 ```{r}
 #Ejemplo de crear nuevas variables con Class Distribution
 credit.fix.preProc.ClssDtrb.Mod<-classDist(credit.fix[,2:3],as.numeric(credit.fix[,16]))
@@ -701,6 +713,8 @@ print(p2,position=c(0.5,0,1,1))
 
 
 # Entrenar varios Modelos/Técnicas
+
+añadir setseed(1234) para que se pueda volver a repetir
 
 ## Escoger varios modelos/técnicas a comparar
 
