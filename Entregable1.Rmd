@@ -727,9 +727,9 @@ credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.BC,predict(credit.preProc.C
 credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.BC,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Test.Transf.CS.BC[credit.Vars.Entrada.Escaladas]))
 
 # Dibujamos las nuevas variables y las antiguas
-p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas]), credit.Datos.Train.Transf.CS.BC[,15],plot="ellipse")
+p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod, credit.xtra.Vars[credit.Vars.Entrada.Escaladas]), credit.xtra.Vars[,15],plot="ellipse")
 
-p2<-featurePlot(x=credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas], credit.Datos.Train.Transf.CS.BC[,15],plot="ellipse")
+p2<-featurePlot(x=credit.xtra.Vars[credit.Vars.Entrada.Escaladas], credit.xtra.Vars[,15],plot="ellipse")
 
 print(p1,position=c(0,0,0.5,1),more=T)
 print(p2,position=c(0.5,0,1,1))
@@ -752,11 +752,26 @@ añadir setseed(1234) para que se pueda volver a repetir
 
 ## Escoger varios modelos/técnicas a comparar
 
-
+Calcularemos las semillas para usarlas en la función trainControl que pasaremos al entrenamientod de los modelos
 ```{r}
+#library(doParallel) -> necesaria en le momento de hacerlo paralelo
+
 set.seed(1234) ## Para la repetición de la ejecución de los modelos
+# seedsLength es = (numero_repeticiones*numero_remuestreos)+1, seguiremos lo visto en clase y usaremos los valores: (3*10)+1
+seedsLength=31
+seeds <- vector(mode = "list", length = seedsLength)
 
-
+# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
+foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
+# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
+# en el ejemplo,para random forest, solo se var´ıa por defecto el hiperpar´ametro mtry
+# para este problema se prueba mtry={2,5,8}, es decir, 3 combinaciones diferentes.
+combHParam=3
+for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
+#H ay que crear una semilla ´unica para el modelo final a entrenar.
+seeds[[seedsLength+1]]<-sample.int(1000, 1)
+# TrainControl con seeds
+credit.TrainCtrl.3cv10.plRF <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
 
 ```
 
