@@ -735,13 +735,32 @@ print(p1,position=c(0,0,0.5,1),more=T)
 print(p2,position=c(0.5,0,1,1))
 ```
 
+De ahora en adelante para simpleficar el nombre del dataset a utilizar guardaremos el train y test en credit.Train.Preprocesado y credit.Test.Preprocesado
 
+```{r}
+credit.Train.Preprocesado<-credit.xtra.Vars
+credit.Test.Preprocesado<-credit.xtra.VarsTest
+```
+
+
+Ahora que tenemos el preprocesado de datos hecho, pasaremos al entrenamiento de los diferentes modelos y técnicas.
 
 # Entrenar varios Modelos/Técnicas
+
 
 añadir setseed(1234) para que se pueda volver a repetir
 
 ## Escoger varios modelos/técnicas a comparar
+
+
+```{r}
+set.seed(1234) ## Para la repetición de la ejecución de los modelos
+
+
+
+```
+
+
 
 ## Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
 
