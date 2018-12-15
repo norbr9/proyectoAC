@@ -46,14 +46,6 @@ colnames(credit) <- c("Male","Age","Debt","Married","BankCustomer","EducationLev
 # Income:	continuous. 
 # Approved: +,- (Si ha sido aprobado)
 
-
-
-credit.trainIdx<-readRDS("credit.trainIdx.rds")
-credit.Datos.Train<-credit[credit.trainIdx,]
-credit.Datos.Test<-credit[-credit.trainIdx,]
-
-nrow(credit.Datos.Train)
-nrow(credit.Datos.Test)
 ```
 
 # Preprocesar Datos
@@ -539,6 +531,24 @@ for(i in 1:15){
 ```
 
 
+
+## Dividir datos en Train/Test
+Ahora que se han pre-procesado los datos parcialmente (Tratando los outliners y nulos) se debe separar el dataset
+en dos conjuntos
+
+```{r}
+credit.trainIdx<-readRDS("credit.trainIdx.rds")
+credit.Datos.Train<-credit.fix[credit.trainIdx,]
+credit.Datos.Test<-credit.fix[-credit.trainIdx,]
+nrow(credit.Datos.Train)
+nrow(credit.Datos.Test)
+```
+
+
+
+
+
+
 ## Eliminar variables superfluas/añadir variables nuevas
 
 ### Eliminar variables con poca varianza
@@ -547,7 +557,7 @@ Cuando una variable tiene poca varianza indica que carece de mucha informacion p
 
 Vemos si existe alguna variable con esta caracteristica
 ```{r}
-nearZeroVar(credit.fix)
+nearZeroVar(credit.Datos.Train)
 ```
 
 Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como esta.
@@ -559,19 +569,19 @@ Cuando dos variables están muy correladas entre ellas basicamente representan l
 Vemos si existen variables de este tipo:
 ```{r}
 # Seleccionamos las variables de entrada
-datos.input<-credit.fix[,1:15]
+datos.input<-credit.Datos.Train[,1:15]
 # Obtenemos la correlaci ́on solo de las variables num ́ericas de las variables de entrada
 datos.cor<-cor(na.omit(datos.input[,sapply(datos.input,FUN=is.numeric)]))
 # Obtenemos los nombres de las columnas num ́ericas de entrada correladas
 colsToRemove<-labels(datos.cor)[[1]][findCorrelation(datos.cor,cutoff=0.85)]
 # Eliminamos las columnas correladas del conjunto completo
-credit.nocorr<-credit.fix[setdiff(names(credit.fix),colsToRemove)]
+credit.nocorr<-credit.Datos.Train[setdiff(names(credit.Datos.Train),colsToRemove)]
 ```
 
 Comprobamos si el dataset de entrada y el de nocorr son diferentes
 
 ```{r}
-identical(credit.nocorr,credit.fix)
+identical(credit.nocorr,credit.Datos.Train)
 ```
 No hay ninguna variable correlada por lo que no se puede eliminar nada.
 
@@ -604,6 +614,59 @@ print(p2,position=c(0.5,0,1,1))
 ## Transformar justificadamente los datos (normalizar/escalar/etc)
 
 ## Escalado
+El cambio de escala se aplica a las variables para normalizarlas y ponerlas todas en una escala común. Esto se
+hace tanto para mejorar la comprensión sobre su distribución y poder compararlas más facilmente evitándo
+la distorsión de diferencia de escalas como por el hecho de que de esta manera se evitan problemas con los
+algoritmos de ajuste de modelos que no posean la propiedad de invarianza al escalado como, por ejemplo,
+los algoritmos basados en gradiente descente (como las redes neuronales que usen backpropagation).
+
+
+```{r}
+# Semilla de números aleatorios
+set.seed(1234)
+
+# Dataset a utilizar. Sus variables de entrada y salida.
+credit.Vars.Salida<-c("Approved")
+credit.Vars.Entrada<-c("Age","YearsEmployed","CreditScore","ZipCode","Income");
+
+# Variable a predecir, variables de entrada a usar y variables que se escalarán.
+credit.Var.Salida.Usada<-c("Approved")
+credit.Vars.Entrada.Usadas<-credit.Vars.Entrada
+
+# Por si algunas se ignoran
+credit.Vars.Entrada.Escaladas<-credit.Vars.Entrada.Usadas # Vars a escalar
+credit.Datos.Usados<-cbind(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+credit.Datos.Train[credit.Var.Salida.Usada])
+
+# Solo indicamos las variables que vayamos a transformar (y usamos TRAIN)
+credit.preProc.CS.Mod<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas],
+  method=c("center","scale"))
+
+# Obtenemos la transformación
+credit.Datos.Train.Transf.CS<-predict(credit.preProc.CS.Mod,credit.Datos.Train)
+
+
+```
+
+
+Ahora podemos ver el efecto del escalado sobre las variables de entrada y comprobamos que estas estén
+en la misma escala y estén centradas.
+```{r}
+# Dibujar un diagrama de densidad para las variables que han sido escaladas
+VarToPlot<-credit.Vars.Entrada
+d1<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F)
+d2<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train.Transf.CS, main="Variables Normalizadas",plot.points=F)
+# Gráficos en blanco y negro (mejor para imprimir)
+trellis.par.set(theme = standard.theme("pdf",color=FALSE))
+print(d1,position=c(0,0,0.5,1),more=T)
+print(d2,position=c(0.5,0,1,1))
+# Volvemos a gráficos normales
+trellis.par.set(theme = standard.theme("pdf"))
+```
 
 
 
