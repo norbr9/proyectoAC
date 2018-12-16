@@ -892,10 +892,10 @@ for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
 #H ay que crear una semilla ´unica para el modelo final a entrenar.
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
 # TrainControl con seeds
-credit.Train.Control.gbm <- trainControl(method = "repeatedcv", number = 10, repeats = 3, verboseIter=T, seeds=seeds, returnResamp = "all") # Guardamos todo para hacer diagramas
+credit.Train.Control.gbm <- trainControl(method = "repeatedcv", number = 10, repeats = 3, verboseIter=T, returnResamp = "all") # Guardamos todo para hacer diagramas
 
 
-#credit.Train.Control.glm <- trainControl(method = "repeatedcv",number = 10,repeats = 3  ,verboseIter=F,returnResamp = "all" ,seeds = seeds )
+credit.Train.Control.glm <- trainControl(method = "repeatedcv",number = 10,repeats = 3  ,verboseIter=F,returnResamp = "all" ,seeds = seeds )
 
 
 # Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
@@ -904,17 +904,19 @@ registerDoParallel(cl)
 
 #Ejecutar Modelos
 set.seed(1234)
-credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method = 'gbm',trControl = credit.Train.Control.gbm , tuneGrid = credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.glm, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
-
-#set.seed(1234)
-#credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],           credit.Datos.Train[[credit.Var.Salida.Usada]], method = 'glm', trControl = credit.Train.Control.glm)
+set.seed(1234)
+credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.glm)
 
 
 # Volvemos al modo no paralelo
 stopImplicitCluster()
 stopCluster(cl)
 registerDoSEQ()
+
+credit.Train.gbm
+credit.Train.glm
 
 ```
 
