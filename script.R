@@ -1,0 +1,1056 @@
+# title: "Entregable1"
+# author: "Norberto García Marín y María Soledad Pérez López"
+# date: "November 29, 2018"
+
+# Para que funcione el script el working directory tiene que ser donde esta este scrpit.
+
+if(!require(ggplot2)) install.packages("caret")
+if(!require(lattice)) install.packages("lattice")
+if(!require(caret)) install.packages("caret")
+if(!require(e1071)) install.packages("e1071")
+if(!require(ellipse)) install.packages("ellipse")
+if(!require(doParallel)) install.packages("doParallel")
+if(!require(rpart)) install.packages("rpart")
+if(!require(gbm)) install.packages("gbm")
+if(!require(MLmetrics)) install.packages("MLmetrics")
+
+library(ggplot2)
+library(lattice)
+library(caret)
+library(e1071)
+library(ellipse)
+library(doParallel)
+library(rpart)
+library(gbm)
+library(MLmetrics)
+
+
+
+# 2. Carga de la base de datos
+credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data",
+                    sep = ",", na.strings = "?", header = F)
+colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "EducationLevel",
+                      "Ethnicity","YearsEmployed", "PriorDefaul", "Employed",
+                      "CreditScore", "DriversLicense", "Citizen",
+                      "ZipCode", "Income","Approved")
+
+# Información de los atributos. Columnas
+# Male:	b, a. 
+# Age:	continuous. 
+# Debt:	continuous. 
+# Married:	u, y, l, t. 
+# BankCustomer:	g, p, gg. 
+# EducationLevel:	c, d, cc, i, j, k, m, r, q, w, x, e, aa, ff. 
+# Ethnicity:	v, h, bb, j, n, z, dd, ff, o. 
+# YearsEmployed:	continuous. 
+# PriorDefaul:	t, f. 
+# Employed:	t, f. 
+# CreditScore: continuous. 
+# DriversLicense:	t, f. 
+# Citizen: g, p, s. 
+# ZipCode: continuous. 
+# Income: continuous. 
+# Approved: +,- (Si ha sido aprobado, esta es la variable de salida)
+
+
+# 3. Preprocesar Datos
+
+## 3.1. Analizar las variables 
+
+#Comenzaremos analizando las diferentes variables que nos ha proporcioado la base de datos descargada.
+
+
+# Resumen de los todos los datos
+summary(credit)
+
+
+
+### 3.1.1. Análisis monovariable
+
+#Para tartar las variables numéricas utilizaremos la función qqplot.data con la que podremos dar una representación de los percentiles con respecto a los de una normal centrada en cero.
+
+
+###########Funciones auxiliares###########
+qqplot.data <- function (vec)   
+{        
+  y <- quantile(vec[!is.na(vec)], c(0.25, 0.75))   
+  x <- qnorm(c(0.25, 0.75))                       
+  slope <- diff(y)/diff(x)          
+  int <- y[1L] - slope * x[1L]       
+  d <- data.frame(resids = vec)     
+  ggplot(d, aes(sample = resids)) + stat_qq() + geom_abline(slope = slope,intercept = int)   
+}                                                                                               
+
+
+
+#Las variables que vamos a analizar serán: Male, Age, 
+
+####### Análisis variable Male #######
+# Variable No Numérica                                                                                
+# Resumen                          
+summary(credit[1], maxsum = Inf)
+# Numero de ocurrencias (porcentaje)    
+porcent <- prop.table(table(credit$Male)) * 100
+cbind(total=table(credit$Male), porcentaje=porcent) 
+# Gráfico de barras    
+barplot(table(credit$Male), ylim = c(0,500))
+
+
+#Male se trata de una variable no numérica, para representar este tipo de variables utilizaremos la función barplot() que nos devolverá un diagrama de barra. En el diagrama devuelto podemos observar que el tipo b dobla el tipo a, como no sabemos qué representa a y b no podemos asumir nada más concreto.
+
+
+
+####### Análisis variable Age #######
+# Variable Continua  
+# Resumen    
+summary(credit[2], maxsum = Inf)
+
+
+# Numero de ocurrencias (porcentaje)     
+porcent <- prop.table(table(credit$Age)) * 100   
+cbind(total=table(credit$Age), porcentaje=porcent)                                             
+
+
+# Estimación de la fucnión de desidad de probabilidad          
+dens<-density(credit$Age,na.rm=T)                             
+hist(credit$Age,xlab="",main="Age",ylim=c(0,max(dens$y)*1.1),probability =T) 
+lines(dens)                                                                 
+# rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      
+# jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
+# por si hubiese valores repetidos                                                                    
+rug(jitter(credit$Age))                                         
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica y posibles valores atípicos
+boxplot(credit$Age,main="Age")                                       
+qqplot.data(credit$Age)+ggtitle("Gráfica Q-Q para Age")
+
+
+
+
+
+
+
+#######Análisis variable Debt#######
+# Variable Continua                                                                                   
+# Resumen                                                                                             
+summary(credit[3], maxsum = Inf)      
+     
+
+
+# Numero de ocurrencias (porcentaje)    
+porcent <- prop.table(table(credit$Debt)) * 100     
+cbind(total=table(credit$Debt), porcentaje=porcent)  
+
+# Histograma con frecuencias de aparición             
+# Estimación de la fucnion de desidad de probabilidad   
+dens<-density(credit$Debt,na.rm=T)                    
+hist(credit$Debt,xlab="",main="Debt",ylim=c(0,max(dens$y)*1.1),probability =T)    
+lines(dens)                     
+rug(jitter(credit$Debt))                            
+
+
+# Diagrama Box-Whisker. Información sobre la dispersión, asimetróa estadística
+# y posibles valores atípicos  
+boxplot(credit$Debt,main="Debt")        
+# Representación de los percentiles con respecto a los de una normal centrada en cero  
+qqplot.data(credit$Debt)+ggtitle("Gráfica Q-Q para Debt")                                                
+
+
+
+
+
+#######Análisis variable Married######
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[4], maxsum = Inf)             
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$Married)) * 100                                                         
+cbind(total=table(credit$Married), porcentaje=porcent)     
+# Gráfico de barras                                                                                   
+barplot(table(credit$Married))           
+
+
+
+
+#######Análisis variable BankCustomer#######
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[5], maxsum = Inf)      
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$BankCustomer)) * 100                                                         
+cbind(total=table(credit$BankCustomer), porcentaje=porcent)   
+# Gráfico de barras                                                                                   
+barplot(table(credit$BankCustomer))       
+
+
+
+
+
+
+#######Análisis variable EducationLevel################
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[6], maxsum = Inf)              
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$EducationLevel)) * 100                                                         
+cbind(total=table(credit$EducationLevel), porcentaje=porcent)   
+# Gráfico de barras                                                                                   
+barplot(table(credit$EducationLevel))     
+
+
+
+
+
+#######Análisis variable Ethnicity#################
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[7], maxsum = Inf)             
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$Ethnicity)) * 100                                                         
+cbind(total=table(credit$Ethnicity), porcentaje=porcent)   
+# Gráfico de barras                                                                                   
+barplot(table(credit$Ethnicity))      
+
+
+
+
+
+#######Análisis variable YearsEmployed#################
+# Variable Continua                                                                                   
+# Resumen                                                                                             
+summary(credit[8], maxsum = Inf)
+
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$YearsEmployed)) * 100                                                         
+cbind(total=table(credit$YearsEmployed), porcentaje=porcent)
+
+# Histograma con frecuencias de aparicion                                                             
+# Estimación de la fucnion de desidad de probabilidad                                                 
+dens<-density(credit$YearsEmployed,na.rm=T)                                                                      
+hist(credit$YearsEmployed,xlab="",main="YearsEmployed",ylim=c(0,max(dens$y)*1.1),probability =T)                            
+lines(dens)                                                                                           
+# rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      
+# jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
+# por si hubiese valores repetidos                                                                    
+rug(jitter(credit$YearsEmployed))         
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
+# y posibles valores atipicos                                                                         
+boxplot(credit$YearsEmployed,main="YearsEmployed")    
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
+qqplot.data(credit$YearsEmployed)+ggtitle("Gráfica Q-Q para YearsEmployed")                                                 
+
+
+
+
+
+#######Análisis variable PriorDefaul#############
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[9], maxsum = Inf)         
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$PriorDefaul)) * 100                                                         
+cbind(total=table(credit$PriorDefaul), porcentaje=porcent)  
+# Gráfico de barras                                                                                   
+barplot(table(credit$PriorDefaul))       
+
+
+
+
+
+
+#######Análisis variable Employed######################
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[10], maxsum = Inf)           
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$Employed)) * 100                                                        
+cbind(total=table(credit$Employed), porcentaje=porcent)     
+# Gráfico de barras                                                                                   
+barplot(table(credit$Employed))      
+
+
+
+
+
+
+
+#######Análisis variable CreditScore####################
+# Variable Continua                                                                                   
+# Resumen                                                                                             
+summary(credit[11], maxsum = Inf)         
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$CreditScore)) * 100                                                        
+cbind(total=table(credit$CreditScore), porcentaje=porcent)                                                              
+# Histograma con frecuencias de aparicion                                                             
+# Estimación de la fucnion de desidad de probabilidad                                                 
+dens<-density(credit$CreditScore,na.rm=T)                                                                     
+hist(credit$CreditScore,xlab="",main="CreditScore",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
+lines(dens)                                                                                           
+# rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      
+# jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
+# por si hubiese valores repetidos                                                                    
+rug(jitter(credit$CreditScore))           
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
+# y posibles valores atipicos                                                                         
+boxplot(credit$CreditScore,main="CreditScore")      
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
+qqplot.data(credit$CreditScore)+ggtitle("Gráfica Q-Q para CreditScore")                                               #
+
+
+
+
+#######Análisis variable DriversLicense###############
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[12], maxsum = Inf)                
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$DriversLicense)) * 100                                                        
+cbind(total=table(credit$DriversLicense), porcentaje=porcent)       
+# Gráfico de barras                                                                                   
+barplot(table(credit$DriversLicense))           
+
+
+
+
+#######Análisis variable Citizen####################
+# Variable No Numérica                                                                                   
+# Resumen                                                                                             
+summary(credit[13], maxsum = Inf)                  
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$Citizen)) * 100                                                        
+cbind(total=table(credit$Citizen), porcentaje=porcent)  
+# Gráfico de barras                                                                                   
+barplot(table(credit$Citizen))               
+
+
+
+
+#######Análisis variable ZipCode#############
+# Variable Continua                                                                                   
+# Resumen                                                                                             
+summary(credit[14], maxsum = Inf)
+
+# Numero de ocurrencias (porcentaje)                                                                  
+porcent <- prop.table(table(credit$ZipCode)) * 100                                                        
+cbind(total=table(credit$ZipCode), porcentaje=porcent)   
+
+
+# Histograma con frecuencias de aparicion                                                             
+# Estimación de la fucnion de desidad de probabilidad                                                 
+dens<-density(credit$ZipCode,na.rm=T)                                                                     
+hist(credit$ZipCode,xlab="",main="ZipCode",ylim=c(0,max(dens$y)*1.1),probability =T)                          
+lines(dens)                                                                                           
+# rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      
+# jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
+# por si hubiese valores repetidos                                                                    
+rug(jitter(credit$ZipCode))            
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
+# y posibles valores atipicos                                                                         
+boxplot(credit$ZipCode,main="ZipCode")             
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
+qqplot.data(credit$ZipCode)+ggtitle("Gráfica Q-Q para ZipCode") 
+
+
+
+#######Análisis variable Income############
+# Variable Continua                                                                                   
+# Resumen                                                                                             
+summary(credit[15], maxsum = Inf)             
+
+# Numero de ocurrencias (porcentaje)       
+porcent <- prop.table(table(credit$Income)) * 100     
+cbind(total=table(credit$Income), porcentaje=porcent)
+
+# Histograma con frecuencias de aparicion                                                             
+# Estimación de la fucnion de desidad de probabilidad       
+dens<-density(credit$Income,na.rm=T)                         
+hist(credit$Income,xlab="",main="Income",ylim=c(0,max(dens$y)*1.1),probability =T) 
+lines(dens)                                                                                           
+# rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      
+# jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
+# por si hubiese valores repetidos                                                                    
+rug(jitter(credit$Income))     
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
+# y posibles valores atipicos                                                                         
+boxplot(credit$Income,main="Income")              
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
+qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income") 
+
+
+
+#Se eliminará la variable ZipCode por no tener información relevante que sirva para el resto del análisis.
+
+
+
+credit.Datos<-credit
+credit.Datos$ZipCode<-NULL
+
+
+
+
+### 3.1.2. Análisis  multivariable
+
+#Para hacer las multivariables haremos uniones con la variable de clase [de salida ( +,-)], para ver como influyen. 
+
+#Calcularemos el coeficiente de correlación, matriz de correlación para poder comprender mejor lo que ocurre con el análisis 
+
+
+#pairs(credit[,2],col=as.numeric(credit$Approved))
+#pairs(credit,credit$Approved)
+#featurePlot(x=iris[,1:4],y=iris[,5],plot="ellipse")
+featurePlot(x=credit[,2],y=credit[,16],plot="density")
+###Variable Male table(credit$Male)
+
+
+y = credit[16]
+#Variable Age
+featurePlot(x=credit[,2],y=credit[,16],plot="density")
+##pairs(credit[,1],col=as.factor(credit$Approved))
+
+#Variable Debt
+featurePlot(x=credit[,3],y=credit[,16],plot="density")
+
+
+
+
+
+
+## 3.2. Tratar valores nulos, extremos o atípicos
+
+### 3.2.1. Tratamiento de valores nulos
+
+#Para tomar medida de cuán serio es el problema de los valores nulos, debemos contar los casos que tienen valores nulos.
+
+
+# Tratamiento de valores nulos
+
+# Elementos que queremos tratar
+tibble::rowid_to_column(credit.Datos)[!complete.cases(credit.Datos),]
+
+# Numero de filas con nulos
+print("Numero de filas con valores nulos")
+nrow(credit.Datos[!complete.cases(credit.Datos),])
+
+# Porcentaje de valores nulos
+print("Porcentaje de filas con valores nulos")
+nrow(credit.Datos[!complete.cases(credit.Datos),])/nrow(credit.Datos)*100
+
+
+#Como vemos, tenemos 31 filas con filas con valores nulos, lo que supone un 4,5% de los casos.
+
+#No es recomendable deshacernos de los nulos sin más, además no hay ningún ejemplar que tenga muchas variables con valores nulos, por lo tanto la solución seriá sustituirlas mediante valores representativos.
+
+
+#### 3.2.1.1. Sustitución mediante valores representativos
+
+#Como la muestra tiene una distribución desplazada skewed para todas las variables continuas, la mediana es la mejor opción como valor central para sustituir.
+
+#Para las variables no continuas sustituiremos los valores nulos por el valor que más se repita.
+
+
+
+# Tratamiento de las variables en funcion de si es continua o no continua
+credit.fix<-credit.Datos
+continua<-c(FALSE,TRUE,TRUE,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE,FALSE,FALSE,TRUE)
+
+for(i in 1:14){
+  if(continua[i]){
+    nulos <- subset(credit.fix, is.na(credit.fix[,i])) 
+    credit.fix[as.numeric(rownames(nulos)), i] <-median(credit.fix[[i]],na.rm=T)
+    
+  } else {
+    valorMasRepetido<-tail(names(sort(table(credit.Datos[i]))), 1) 
+    nulos <- subset(credit.fix, is.na(credit.fix[,i])) 
+    credit.fix[as.numeric(rownames(nulos)), i] <- valorMasRepetido
+  }
+}
+
+
+
+#Y comprobamos si se han sustituido correctamente.
+
+
+print("Porcentaje de filas con valores nulos")
+nrow(credit[!complete.cases(credit.fix),])/nrow(credit.fix)*100
+
+
+
+### 3.2.2.  Tratamiento de valores extremos/atípicos
+
+#Sustitución de los valores extremos y atípicos por la mediana de la variable en cuestión.
+
+
+for(i in 1:14){
+  if(!continua[i]) next;
+  
+  extremos<-boxplot(credit.fix[i],boxwex=0.15,plot=F)$out
+  porArriba<-min(extremos[extremos > median(na.omit(credit.fix[[i]]))])
+  porArribaSet <- credit.fix[credit.fix[i]>porArriba,]
+  credit.fix[as.numeric(rownames(porArribaSet)), i] <- median(credit.fix[[i]],na.rm=T)
+}
+
+
+
+
+## 3.2.3. Dividir datos en Train/Test
+
+#Ahora que se han pre-procesado los datos parcialmente (Tratando los outliners y nulos) se debe separar el dataset en dos conjuntos.
+
+
+credit.trainIdx<-readRDS("credit.trainIdx.rds")
+credit.Datos.Train<-credit.fix[credit.trainIdx,]
+credit.Datos.Test<-credit.fix[-credit.trainIdx,]
+nrow(credit.Datos.Train)
+nrow(credit.Datos.Test)
+
+
+
+
+
+
+
+## 3.3. Eliminar variables superfluas y añadir variables nuevas
+
+### 3.3.1. Eliminar variables con poca varianza
+
+#Vamos a intentar eliminar variables con poca varianza.
+#Cuando una variable tiene poca varianza indica que carece de mucha información para crear distinciones entre los datos. Esto puede generar problemas a muchos algoritmos de machine learning.
+
+#Vemos si existe alguna variable con esta caracteristica:
+  
+nearZeroVar(credit.Datos.Train)
+
+
+#Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como está.
+
+### 3.3.2. Eliminar variables correladas
+
+#Cuando dos variables están muy correladas entre ellas basicamente representan la misma información. Suele ser interesante eliminar una de dichas variables y simplificar el modelo al tener menos variables de entrada.
+
+#Vemos si existen variables de este tipo:
+  
+# Seleccionamos las variables de entrada
+datos.input<-credit.Datos.Train[,1:14]
+# Obtenemos la correlación solo de las variables numéricas de las variables de entrada
+datos.cor<-cor(na.omit(datos.input[,sapply(datos.input,FUN=is.numeric)]))
+# Obtenemos los nombres de las columnas num ́ericas de entrada correladas
+colsToRemove<-labels(datos.cor)[[1]][findCorrelation(datos.cor,cutoff=0.85)]
+# Eliminamos las columnas correladas del conjunto completo
+credit.nocorr<-credit.Datos.Train[setdiff(names(credit.Datos.Train),colsToRemove)]
+
+
+#Comprobamos si el dataset de entrada y el de nocorr son iguales:
+  
+
+identical(credit.nocorr,credit.Datos.Train)
+
+#No hay ninguna variable correlada por lo que no se puede eliminar nada.
+
+
+### 3.3.3. Crear Dummy Variables
+#Las Variables Dummy es una forma de transformar factores en un conjunto de variables numéricas donde cada nivel es ortogonal al resto de variables dummy para ese factor.
+#Las variables dummy son necesarias en algunos modelos matemáticos que trabajan con la matriz de atributos y valores de entrada.
+
+#Como caret transforma por defecto las variables de entrada que son factores creando dummy variables, no haremos esta transformación de forma manual.
+
+
+
+
+
+## 3.4. Transformar los datos
+
+### 3.4.1. Escalado
+
+#El cambio de escala se aplica a las variables para normalizarlas y ponerlas todas en una escala común. Esto se hace tanto para mejorar la comprensión sobre su distribución y poder compararlas más facilmente evitándo la distorsión de diferencia de escalas como por el hecho de que de esta manera se evitan problemas con los algoritmos de ajuste de modelos que no posean la propiedad de invarianza al escalado como, por ejemplo, los algoritmos basados en gradiente descente (como las redes neuronales que usen backpropagation).
+
+
+
+# Semilla de números aleatorios
+# set.seed(1234) -> no necesario, Eso lo usas cuando quieres que se pueda repetir
+# el experimento tal cual lo has hecho, Escalar el conjunto de datos siempre
+# lo va a hacer igual
+
+# Dataset a utilizar. Sus variables de entrada y salida.
+# Variable a predecir, variables de entrada a usar y variables que se escalarán.
+credit.Var.Salida.Usada<-c("Approved")
+credit.Vars.Entrada.Usadas<-c("Age", "Debt", "YearsEmployed","CreditScore", "Income")
+# Por si algunas se ignoran
+credit.Vars.Entrada.Escaladas<-credit.Vars.Entrada.Usadas # Vars a escalar
+
+# Solo indicamos las variables que vayamos a transformar (y usamos TRAIN)
+credit.preProc.CS.Mod<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas],
+                                  method=c("center","scale"))
+
+# Obtenemos la transformación
+credit.Datos.Train.Transf.CS<-predict(credit.preProc.CS.Mod,credit.Datos.Train)
+credit.Datos.Test.Transf.CS<-predict(credit.preProc.CS.Mod,credit.Datos.Test)
+
+
+
+
+#Ahora podemos ver el efecto del escalado sobre las variables de entrada y comprobamos que estas estén en la misma escala y estén centradas.
+
+
+# Dibujar un diagrama de densidad para las variables que han sido escaladas
+VarToPlot<-credit.Vars.Entrada.Escaladas
+d1<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train,main="Variables sin Normalizar",
+  plot.points=F,xlim = c(-2,4),ylim = c(0,5),
+  xlab = "Valores Variables Entrada")
+d2<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train.Transf.CS, main="Variables Normalizadas",
+  plot.points=F, xlab = "Valores Variables Entrada", xlim = c(-2,4))
+# Gráficos en blanco y negro (mejor para imprimir)
+trellis.par.set(theme = standard.theme("pdf",color=FALSE))
+print(d1,position=c(0,0,0.5,1),more=T)
+print(d2,position=c(0.5,0,1,1))
+# Volvemos a gráficos normales
+trellis.par.set(theme = standard.theme("pdf"))
+
+
+
+### 3.4.2. Transformaciones de relaciones entre variables
+
+#No es necesario, ya que cuando hicimos el estudio para eliminar variables correladas comprobamos que no existían.
+
+### 3.4.3. Transformaciones de distribuciones asimétricas
+
+#Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson, ya que la asimetría en algunos casos es media y en otros es bastante grande.
+
+
+
+
+credit.preProc.CS.Mod.YJ<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas],
+                                     method=c("center","scale", "YeoJohnson"))
+
+# Obtenemos la transformación
+credit.Datos.Train.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Train)
+credit.Datos.Test.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Test)
+
+
+d1<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F, 
+  xlab = "Valores Variables Entrada", xlim = c(0,8))
+
+d3<-densityplot(
+  formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
+  data=credit.Datos.Train.Transf.CS.YJ, main="Variables Aplicado YJ",plot.points=F,
+  xlab = "Valores Variables Entrada")
+
+trellis.par.set(theme = standard.theme("pdf",color=FALSE))
+print(d1,position=c(0,0,0.5,1),more=T)
+print(d3,position=c(0.5,0,1,1))
+# Volvemos a gráficos normales
+trellis.par.set(theme = standard.theme("pdf"))
+
+
+
+
+#Como no queremos perder información que puede ser relevante no vamos a aplicar las técnicas de Binning ni Bloqueo.
+
+
+
+### 3.4.4. Crear nuevas variables
+
+
+# Ejemplo de crear nuevas variables con Class Distribution
+credit.preProc.ClssDtrb.Mod<-classDist(credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]
+                                       ,credit.Datos.Train.Transf.CS.YJ[,15])
+# A~nadimos las nuevas variables
+credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.YJ,
+                        predict(credit.preProc.ClssDtrb.Mod,
+                                credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
+credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.YJ,
+                            predict(credit.preProc.ClssDtrb.Mod,
+                                    credit.Datos.Test.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
+
+# Dibujamos las nuevas variables y las antiguas
+p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod,
+                          credit.xtra.Vars[credit.Vars.Entrada.Escaladas]),
+                credit.xtra.Vars[,15],plot="ellipse")
+
+p2<-featurePlot(x=credit.xtra.Vars[credit.Vars.Entrada.Escaladas],
+                credit.xtra.Vars[,15],plot="ellipse")
+
+print(p1,position=c(0,0,0.5,1),more=T)
+print(p2,position=c(0.5,0,1,1))
+
+
+#De ahora en adelante para simplificar el nombre del dataset a utilizar guardaremos el train y test en credit.Train.Preprocesado y credit.Test.Preprocesado:
+  
+
+credit.Train.Preprocesado<-credit.xtra.Vars
+credit.Test.Preprocesado<-credit.xtra.VarsTest
+
+
+
+#Ahora que tenemos el preprocesado de datos hecho, pasaremos al entrenamiento de los diferentes modelos y técnicas.
+
+# 4. Entrenar varios Modelos/Técnicas
+
+
+## 4.1. Escoger varios modelos/técnicas a comparar
+
+
+### 4.1.1. Modelo GLM (Generalized Linear Model)
+#El Modelo GlM es una generalizacion flexible de una regresión lineal. Esta, permite variables de respuesta que tienen modelos de distribución de errores distintos de una distribución normal.
+
+#Existen 3 componentes en un modelo GLM:
+# * Random Component: Distribución de probabildiad de las variables de respuesta.
+#* Systematic Component: La combinación lineal de variables en el modelo que sirven para crear un predictor lineal.
+#* Link Function, η or g(μ): Especifica la union entre random component y Systematic Compononet.
+
+
+
+### 4.1.2. Modelo RPART
+
+#El algoritmo CART de árboles de decisión de clasificación y regresión. Este, funciona diviendo el dataset recursivamente, lo que significa que los substest que se crean son divididos de nuevo hasta que se cumple un criterio de terminación. En cada paso, la división es hecha en base a una variable independiente que resulta de la reduccion más larga posible de la variable dependiente (pronosticada).
+
+
+### 4.1.3. Modelo RF
+#El modelo Random Forest es una combinación de arboles predictores. Cada árbol depende de los valores de un vector probado de manera independiente. Es una modificacion de bagging (Explicado en el siguiente apartado). Basicamente consiste en dividir el trainset en substest, tomar una decisión para cada arbol resultante y agregar su resultado.
+
+#Actualmente es uno de los metodos más populares y potentes en Machine Learning.
+
+
+
+### 4.1.4. Modelo GBM (Stochastic Gradient Boosting)
+
+#El modelo GBM o Potenciacion del gradiente, es una técnica de machine learning utilizada para problemas de analisis de regresión y clasificación estadística. Esta técnica produce un modelo predictivo en forma de conjunto de modelos de predicción débiles, normalmente árboles de decisión. El modelo se construye de forma escalonada como lo hacen otros métodos de boosting, es decir, los predictores no se forman de manerera independiente, si no, de manera secuencial.
+
+
+#![Imagen de Baggin y Boosting](boosting.png)
+#>Baggin & Boosting 
+
+#La principal diferencia entre Baggin y Boosting es que en Bagging se construye los predictores de manera independiente y luego se combinan y en el Boosting se construyen de manera dependediente y secuencialmente.
+
+
+
+## 4.2. Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
+
+
+### 4.2.1. Modelo GLM
+
+#El modelo glm no tiene hiper-parámetros por lo que no se puede modficar nada.
+
+
+modelLookup("glm")
+
+
+### 4.2.2. Modelo RPART
+
+
+#El modelo rpart tiene como único parámetro el cp.
+
+
+modelLookup("rpart")
+
+#Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función train, como lo visto en clase vamos a decirdidr que el número de combinaciones a probar sea 10.
+
+
+### 4.2.3. Modelo RF
+
+#El modelo rf tiene como único parámetro el mtry.
+
+
+modelLookup("rf")
+
+
+
+### 4.2.4. Modelo GBM (Stochastic Gradient Boosting)
+
+#Encontramos los hiperparámetros para este modelo:
+  
+
+modelLookup("gbm")
+
+
+#Vemos que existen 4 hiper-parámetros: n.trees, interaction.depth, shrinkage y n.minobsinnode.
+#Estos serán los que modificaremos utilizando TuneGrid. Basicamente, TuneGrid hace posible que se pueda pasar una parrilla de combianciones a la función train().
+
+
+credit.Train.gbm.grid <- expand.grid(
+  n.trees=c(100,200,500,1000,2000),
+  shrinkage=c(0.01,0.05,0.1),
+  n.minobsinnode = c(3,5,10,15),
+  interaction.depth=c(1,2,5,10)
+)
+
+
+
+
+## 4.3. Ejecución de los modelos con dos conjuntos de datos.
+
+### 4.3.1 Modelos con datos sin transformar
+
+#En este entrenamiento usaremos el conjunto de datos de credit.Datos.Train, que solo tiene tratado los outliners y nulos.
+
+
+set.seed(1234) ## Para la repetición de la ejecución de los modelos
+# seedsLength es = (numero_repeticiones*numero_remuestreos)+1,
+# seguiremos lo visto en clase y usaremos los valores: (3*10)+1
+seedsLength=31
+seeds <- vector(mode = "list", length = seedsLength)
+
+# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
+foldIndexes<-createMultiFolds(credit.Datos.Train[[credit.Var.Salida.Usada]],k=10,times=3)
+
+# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
+combHParam=100
+for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
+#H ay que crear una semilla ´unica para el modelo final a entrenar.
+seeds[[seedsLength+1]]<-sample.int(1000, 1)
+
+# TrainControl con seeds
+credit.Train.Control.CV1 <- trainControl(method = "repeatedcv",number=10,
+                                         repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds)
+
+
+# Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
+cl <- makeCluster(detectCores()-1)
+registerDoParallel(cl)
+
+#Ejecutar Modelos
+#Modelo gbm con tuneGrid
+set.seed(1234)
+credit.Train.gbm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm',
+                           trControl=credit.Train.Control.CV1,
+                           tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+
+#Modelo glm
+set.seed(1234)
+credit.Train.glm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+                           credit.Datos.Train[[credit.Var.Salida.Usada]], 
+                           method='glm', trControl = credit.Train.Control.CV1)
+
+#Modelo RF con tuneLength
+set.seed(1234)
+
+credit.Train.rf.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+                          credit.Datos.Train[[credit.Var.Salida.Usada]],
+                          method='rf', verbose=F, trControl=credit.Train.Control.CV1,
+                          tuneLength = 4)
+
+#Modelo RPART con tuneLength
+set.seed(1234)
+credit.Train.rpart.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+                             credit.Datos.Train[[credit.Var.Salida.Usada]],
+                             method='rpart',
+                             trControl=credit.Train.Control.CV1, tuneLength = 10)
+
+
+# Volvemos al modo no paralelo
+stopImplicitCluster()
+stopCluster(cl)
+registerDoSEQ()
+
+
+
+
+
+### 4.3.2 Modelos con datos transformados
+
+#En este entrenamiento usaremos el conjunto de datos de credit.Train.Preprocesado, donde eliminamos y creamos variables y transformamos las que tenía.
+
+
+set.seed(1234)
+seedsLength=31
+seeds <- vector(mode = "list", length = seedsLength)
+
+# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
+foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
+
+# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
+combHParam=100
+for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
+#H ay que crear una semilla ´unica para el modelo final a entrenar.
+seeds[[seedsLength+1]]<-sample.int(1000, 1)
+
+# TrainControl con seeds
+credit.Train.Control.CV2 <- trainControl(method = "repeatedcv",number=10,
+                                         repeats=3, verboseIter=F, returnResamp = "all",
+                                         seeds=seeds )
+
+
+# Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
+cl <- makeCluster(detectCores()-1)
+registerDoParallel(cl)
+
+#Ejecutar Modelos
+#Modelo gbm con tuneGrid
+set.seed(1234)
+credit.Train.gbm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                          credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                          method='gbm', trControl=credit.Train.Control.CV2, 
+                          tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+
+#Modelo glm
+set.seed(1234)
+credit.Train.glm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                          credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                          method='glm', 
+                          trControl = credit.Train.Control.CV2)
+
+#Modelo RF con tuneLength
+set.seed(1234)
+credit.Train.rf.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                         credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                         method='rf', 
+                         verbose=F, trControl=credit.Train.Control.CV2, 
+                         tuneLength = 4)
+
+
+#Modelo RPART con tuneLength
+set.seed(1234)
+credit.Train.rpart.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                            credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                            method='rpart', 
+                            trControl=credit.Train.Control.CV2, 
+                            tuneLength = 10)
+
+
+# Volvemos al modo no paralelo
+stopImplicitCluster()
+stopCluster(cl)
+registerDoSEQ()
+
+
+
+
+
+
+# 5. Comparar Modelos
+
+## 5.1. Comparar el rendimiento de los diferentes modelos
+
+#Comparamos todos los modelos entre ellos.
+
+
+credit.Train.Modelos.Acc<-list(
+  GLM.nt=credit.Train.glm.nt,
+  RPART.nt=credit.Train.rpart.nt,
+  RF.nt=credit.Train.rf.nt,
+  GBM.nt=credit.Train.gbm.nt,
+  GLM.t=credit.Train.glm.t,
+  RPART.t=credit.Train.rpart.t,
+  RF.t=credit.Train.rf.t,
+  GBM.t=credit.Train.gbm.t
+)
+credit.Train.Resamp.Acc<-resamples(credit.Train.Modelos.Acc)
+summary(credit.Train.Resamp.Acc)
+
+
+# Diversos diagramas para comparar los modelos
+trellis.par.set(caretTheme())
+densityplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free"),
+                                                  y = list(relation = "free")), auto.key = list(columns = 4), pch = "|")
+
+bwplot(credit.Train.Resamp.Acc, metric = "Accuracy")
+
+dotplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free")), between = list(x = 2))
+
+
+
+
+## 5.2. Decidir justificadamente el modelo final
+
+#Con los resultados del rendimiento en el apartado anterior, podemos ver que los entrenamientos que descatan son los que utilizan gbm (potenciación del gradiente), tanto con los datos básicos como con los preprocesados.
+
+#En el diagrama generado por la función dotplot() podemos ver claramente como los modelos gbm están entre el 72%~73% y el 76%~77% de aciertos, siendo los que queden por delante de los demás.
+
+#Si pasamos al diagrama devuelto por bwplt() obvervamos que algunas veces pueden llegar a alcanzar casi el 85% de aciertos. No podemos pasar por alto que el modelo rf aplicado sobre los datos transformados sobrepasa ese 85%, pero nos decantamos por los resultados mostrados por el Cleveland dot plot, ya que da el intervalo de confianza al 95% del rendimiento sobre los conjuntos de validación.
+
+#En la gráfica de densityplot() vemos que glm y gbm sobre los datos no transformados tienen mayor frecuencia entre 70% y el 80% de aciertos, aunque como lo explicado anteriormente gbm queda por delante.
+
+#Con lo descrito y basándonos en las comparaciones decidimos que nos quedamos como modelo final el gbm aplicado sobre los datos transformados, ya que en ocasiones puede dar mejores resultados que el modelo gbm sobre los datos no tratados.
+
+
+
+## 5.3. Evaluar el rendimiento futuro del modelo final
+
+#Vamos a evaluar el rendimiento para el modelo GBM:
+  
+
+# Prediciendo los valores del conjunto Test (nunca vistos)
+preds<-predict(credit.Train.gbm.t,
+               newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas])
+# Reordenamos los niveles para que la clase positiva (pos) sea el primero
+preds.ord<-factor(preds,levels(preds)[c(2,1)])
+predsProbs<-predict(credit.Train.gbm.nt,
+                    newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas],
+                    type="prob")
+
+
+
+
+
+
+
+postResample(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]])
+# Reordenamos los niveles para que pos(itivo) sea el primero
+obs.ord<-credit.Test.Preprocesado[[credit.Var.Salida.Usada]]
+obs.ord<-factor(obs.ord,levels(obs.ord)[c(2,1)])
+# Datos para twoClassSummary
+data2ClassSum<-data.frame(pred=preds.ord,obs=obs.ord,
+                          pos=predsProbs["+"])
+dataMnLogLoss<-data.frame(pred=preds.ord,obs=obs.ord,
+                          pos=predsProbs["+"],neg=predsProbs["-"])
+
+#twoClassSummary(data2ClassSum,lev=levels(obs.ord))
+prSummary(data2ClassSum,lev=levels(obs.ord))
+#mnLogLoss(dataMnLogLoss,lev=levels(obs.ord))
+# Calcula datos para lift y calibration curves
+lift_results <- data.frame(Class = obs.ord)
+lift_results$GBM <- predict(credit.Train.gbm.nt,
+                            credit.Test.Preprocesado[credit.Vars.Entrada.Usadas], type = "prob")[,"+"]
+trellis.par.set(caretTheme())
+# Calcula lift curves
+lift_obj <- lift(Class ~ GBM, data = lift_results)
+plot(lift_obj, values = 60, auto.key = list(columns = 3,
+                                            lines = TRUE,
+                                            points = FALSE))
+# Calcula calibration curves
+cal_obj <- calibration(Class ~ GBM, data = lift_results,
+                       cuts = 13)
+plot(cal_obj, type = "l", auto.key = list(columns = 3,
+                                          lines = TRUE,
+                                          points = FALSE))
+
+
+
+# Usamos el parámetro positive="pos" porque sino usa como positive el primer
+# nivel que encuentra (que en este caso es "neg")
+caret::confusionMatrix(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]],
+                       positive="+")
+
+
+
+#Se ha obtenido un 74% de accuracy. Es decir un 74% de los datos de prueba se han clasificado correctamente.
+
+
+
+
+# 6. Bibliografía
+
+#Análisis de datos y machine learning con R (caret) - Sesiones de prácticas de Aprendizaje Computacional
+
+#<https://www.stat.umn.edu/arc/yjpower.pdf>
+  
+# <https://onlinecourses.science.psu.edu/stat504/node/216/>
+  
+# <https://stats.stackexchange.com/questions/27651/how-would-you-explain-generalized-linear-models-to-people-with-no-statistical-ba>
+  
+# <https://www.jstatsoft.org/article/view/v028i05/v28i05.pdf>
+  
+# <https://medium.com/mlreview/gradient-boosting-from-scratch-1e317ae4587d>
+  
+# <https://www.stat.umn.edu/arc/yjpower.pdf>
+  
+# <https://cran.r-project.org/web/packages/gbm/gbm.pdf>
+  
+# <https://nycdatascience.com/blog/student-works/credit-card-approval-analysis/>
+  
+# <https://quantdare.com/what-is-the-difference-between-bagging-and-boosting/>
+  
