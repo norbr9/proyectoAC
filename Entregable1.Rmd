@@ -61,7 +61,7 @@ colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "Educati
 
 ### 3.1.1. Análisis monovariable
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 
 ###########Funciones auxiliares###########
 qqplot.data <- function (vec)   
@@ -102,7 +102,7 @@ barplot(table(credit$Male))
 
 
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 #######Análisis variable Age#######
 # Variable Continua  
 # Resumen    
@@ -701,8 +701,7 @@ Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función tra
 
 ### 4.1.3. Modelo RF
 
-El algoritmo CART de árboles de decisión de clasificación y regresión.
-Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función train, como lo visto en clase vamos a decirdidr que el número de combinaciones a probar sea 10.
+
 
 ### 4.1.4. Modelo GBM (Stochastic Gradient Boosting)
 
@@ -724,7 +723,7 @@ Calcularemos las semillas para usarlas en la función trainControl que pasaremos
 
 ### 4.2.1. Modelo GLM
 
-El modelo glm no tiene hiper-parametros por lo que no se puede modficar nada.
+El modelo glm no tiene hiper-parámetros por lo que no se puede modficar nada.
 
 ```{r}
 modelLookup("glm")
@@ -749,14 +748,14 @@ modelLookup("rf")
 
 ### 4.2.4. Modelo GBM (Stochastic Gradient Boosting)
 
-Encontramos los hiperparametros para este modelo:
+Encontramos los hiperparámetros para este modelo:
 
 ```{r}
 modelLookup("gbm")
 ```
 
 
-Vemos que existen 4 hiper-parametros: n.trees, interaction.depth, shrinkage y n.minobsinnode.
+Vemos que existen 4 hiper-parámetros: n.trees, interaction.depth, shrinkage y n.minobsinnode.
 Estos serán los que modificaremos utilizando TuneGrid. Basicamente, TuneGrid hace posible que se pueda pasar una parrilla de combianciones a la función train().
 
 ```{r}
@@ -810,7 +809,7 @@ credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.D
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf2<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
+credit.Train.rf<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
 
 #Modelo RF con tuneLength
 set.seed(1234)
@@ -831,7 +830,9 @@ credit.Train.rpart
 
 
 ### Modelo GBM (Stochastic Gradient Boosting)
-Grafico de la precision del modelo frente a los hiper-parametros
+
+Gráfico de la precision del modelo frente a los hiper-parámetros
+
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -841,12 +842,12 @@ options(max.print = 1000)
 ```
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros
+Grafico del valor estadistico Kappa frente a los hiper-parámetros
 ```{r}
 plot(credit.Train.gbm, metric = "Kappa")
 ```
 
-Grafico de nivel, precision frente a hiper-parametros.
+Grafico de nivel, precision frente a hiper-parámetros.
 
 ```{r}
 plot(credit.Train.gbm, plotType = "level")
@@ -897,7 +898,7 @@ credit.Train.glm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], c
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf2<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
+credit.Train.rf<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
 
 #Modelo RPART con tuneLength
 set.seed(1234)
