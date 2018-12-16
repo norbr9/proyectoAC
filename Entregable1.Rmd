@@ -35,8 +35,11 @@ library(MLmetrics)
 
 ```{r}
 
-credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data", sep = ",", na.strings = "?", header = F)
-colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "EducationLevel", "Ethnicity", "YearsEmployed", "PriorDefaul", "Employed", "CreditScore", "DriversLicense", "Citizen", "ZipCode", "Income","Approved")
+credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data",
+                    sep = ",", na.strings = "?", header = F)
+colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "EducationLevel", "Ethnicity",
+                      "YearsEmployed", "PriorDefaul", "Employed", "CreditScore", "DriversLicense", "Citizen",
+                      "ZipCode", "Income","Approved")
 
 # Informacion de los atributos. Columnas
 # Male:	b, a. 
