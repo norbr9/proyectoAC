@@ -824,7 +824,6 @@ registerDoSEQ()
 ```
 
 
-
 Y aquí los mejores resultados de cada modelo:
 
 ```{r}
@@ -937,19 +936,6 @@ max(credit.Train.rpart.t$results$Accuracy)
 
 La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
 
-Para los datos transformados:
-```{r}
-credit.Train.gbm.t$bestTune
-max(credit.Train.gbm.t$results$Accuracy)
-```
-
-Y sin transformar:
-
-```{r}
-credit.Train.gbm.nt$bestTune
-max(credit.Train.gbm.nt$results$Accuracy)
-```
-
 
 Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
 
@@ -1013,6 +999,7 @@ resampleHist(credit.Train.gbm.t)
 
 Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
 Dibuja el Gráfico de la distribucion de remuestreo
+
 ```{r}
 resampleHist(credit.Train.gbm.nt)
 ```
@@ -1024,19 +1011,8 @@ Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prá
 
 
 ### Modelo GLM
+
 Ya que GLM no tiene hiper-parametros, no existe una mejor configuracion.Aun así, el mejor resultado es la siguiente.
-
-Para los datos transformados:
-```{r}
-max(credit.Train.glm.t$results$Accuracy)
-```
-
-Y sin transformar:
-
-```{r}
-max(credit.Train.glm.nt$results$Accuracy)
-```
-
 
 Observamos que para los datos sin transformar se obtine un resultado ligeramente superior.
 
@@ -1046,6 +1022,7 @@ Como hemos dicho antes, al no existir hiper-parametros no se puede dibujar ningu
 
 Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
 Dibuja el Gráfico de la distribucion de remuestreo
+
 ```{r}
 resampleHist(credit.Train.glm.t)
 ```
@@ -1060,19 +1037,6 @@ Ambos son muy similares.
 
 ### Modelo RPART
 La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
-
-Para los datos transformados:
-```{r}
-credit.Train.rpart.t$bestTune
-max(credit.Train.gbm.t$results$Accuracy)
-```
-
-Y sin transformar:
-
-```{r}
-credit.Train.rpart.nt$bestTune
-max(credit.Train.gbm.nt$results$Accuracy)
-```
 
 
 Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
@@ -1135,18 +1099,6 @@ Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prá
 
 La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
 
-Para los datos transformados:
-```{r}
-credit.Train.rf.t$bestTune
-max(credit.Train.rf.t$results$Accuracy)
-```
-
-Y sin transformar:
-
-```{r}
-credit.Train.rf.nt$bestTune
-max(credit.Train.rf.nt$results$Accuracy)
-```
 
 En este caso se ha obtenido un mejor resultado con los datos transformados.
 
@@ -1189,12 +1141,14 @@ plot(credit.Train.rf.nt, metric = "Kappa")
 
 Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
 Dibuja el Gráfico de la distribucion de remuestreo
+
 ```{r}
 resampleHist(credit.Train.rf.t)
 ```
 
 Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
 Dibuja el Gráfico de la distribucion de remuestreo
+
 ```{r}
 resampleHist(credit.Train.rf.nt)
 ```
@@ -1206,10 +1160,49 @@ Ambos resultados son muy parecidos.
 
 ## 5.2. Decidir justificadamente el modelo final
 
+Comparamos todos los modelos entre ellos.
+
+```{r, warning=FALSE}
+
+credit.Train.Modelos.Acc<-list(
+  GLM.nt=credit.Train.glm.nt,
+  RPART.nt=credit.Train.rpart.nt,
+  RF.nt=credit.Train.rf.nt,
+  GBM.nt=credit.Train.gbm.nt,
+  GLM.t=credit.Train.glm.t,
+  RPART.t=credit.Train.rpart.t,
+  RF.t=credit.Train.rf.t,
+  GBM.t=credit.Train.gbm.t
+)
+credit.Train.Resamp.Acc<-resamples(credit.Train.Modelos.Acc)
+summary(credit.Train.Resamp.Acc)
+
+
+# Diversos diagramas para comparar los modelos
+trellis.par.set(caretTheme())
+densityplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free"),
+y = list(relation = "free")), auto.key = list(columns = 4), pch = "|")
+bwplot(credit.Train.Resamp.Acc, metric = "Accuracy")
+
+
+```
+
+
+
 ## 5.3. Evaluar el rendimiento futuro del modelo final
 
 
 
+
+
+
+
+
+
+
+# 6. Bibliografía
+
+https://www.stat.umn.edu/arc/yjpower.pdf
 
 
 
