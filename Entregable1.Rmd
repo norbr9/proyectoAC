@@ -824,34 +824,6 @@ registerDoSEQ()
 ```
 
 
-Y aquí los mejores resultados de cada modelo:
-
-```{r}
-credit.Train.gbm.nt$bestTune
-print('BGM')
-max(credit.Train.gbm.nt$results$Accuracy)
-
-
-#glm no tiene hiper-parametros
-print('BLM')
-max(credit.Train.glm.nt$results$Accuracy)
-
-
-credit.Train.rf.nt$bestTune
-print('RF')
-max(credit.Train.rf.nt$results$Accuracy)
-
-
-credit.Train.rpart.nt$bestTune
-print('RPART')
-max(credit.Train.rpart.nt$results$Accuracy)
-
-
-```
-
-Se puede observar que GBM ha conseguido el mejor resultado
-
-
 
 
 ### 4.3.2 Modelos con datos transformados
@@ -906,23 +878,6 @@ registerDoSEQ()
 
 ```
 
-Y aquí los mejores resultados de cada modelo:
-```{r}
-credit.Train.gbm.t$bestTune
-max(credit.Train.gbm.t$results$Accuracy)
-
-
-#glm no tiene hiper-parametros
-max(credit.Train.glm.t$results$Accuracy)
-
-
-credit.Train.rf.t$bestTune
-max(credit.Train.rf.t$results$Accuracy)
-
-credit.Train.rpart.t$bestTune
-max(credit.Train.rpart.t$results$Accuracy)
-
-```
 
 
 
@@ -931,234 +886,6 @@ max(credit.Train.rpart.t$results$Accuracy)
 # 5. Comparar Modelos
 
 ## 5.1. Comparar el rendimiento de los diferentes modelos
-
-### Modelo GBM (Stochastic Gradient Boosting)
-
-La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
-
-
-Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
-
-Aunque el modelo gbm ha obtenido el mayor accuracy otra vez, se puede observar una disminución del valor con respecto al caso anterior.
-
-
-
-Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Transformados)
-```{r}
-# Incrementamos el número de lineas que muestra print
-options(max.print = 10000)
-# Usamos escala logaritmica en el eje x
-plot(credit.Train.gbm.t,scales=list(x=list(log=T)))
-options(max.print = 1000)
-```
-
-
-Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Sin Transformar)
-```{r}
-# Incrementamos el número de lineas que muestra print
-options(max.print = 10000)
-# Usamos escala logaritmica en el eje x
-plot(credit.Train.gbm.nt,scales=list(x=list(log=T)))
-options(max.print = 1000)
-```
-
-
-
-
-Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Transformados)
-```{r}
-plot(credit.Train.gbm.t, metric = "Kappa")
-```
-
-
-Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Sin Transformar)
-```{r}
-plot(credit.Train.gbm.nt, metric = "Kappa")
-```
-
-
-
-Gráfico de nivel, precisión frente a hiper-parametros (Datos Transformados)
-
-```{r}
-plot(credit.Train.gbm.t, plotType = "level")
-```
-
-Gráfico de nivel, precisión frente a hiper-parametros (Datos Sin Transformar)
-
-```{r}
-plot(credit.Train.gbm.nt, plotType = "level")
-```
-
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el Gráfico de la distribucion de remuestreo
-```{r}
-resampleHist(credit.Train.gbm.t)
-```
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el Gráfico de la distribucion de remuestreo
-
-```{r}
-resampleHist(credit.Train.gbm.nt)
-```
-
-
-
-Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prácticamente el mismo.
-
-
-
-### Modelo GLM
-
-Ya que GLM no tiene hiper-parametros, no existe una mejor configuracion.Aun así, el mejor resultado es la siguiente.
-
-Observamos que para los datos sin transformar se obtine un resultado ligeramente superior.
-
-
-Como hemos dicho antes, al no existir hiper-parametros no se puede dibujar ninguna grafica que contemple cambios enrte los resultados y los parametros. Pero si es posible dibujar el Gráfico de la distribuciond e remuestreo:
-
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el Gráfico de la distribucion de remuestreo
-
-```{r}
-resampleHist(credit.Train.glm.t)
-```
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el Gráfico de la distribucion de remuestreo
-```{r}
-resampleHist(credit.Train.glm.nt)
-```
-Ambos son muy similares.
-
-
-### Modelo RPART
-La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
-
-
-Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
-
-
-Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Transformados)
-```{r}
-# Incrementamos el número de lineas que muestra print
-options(max.print = 10000)
-# Usamos escala logaritmica en el eje x
-plot(credit.Train.rpart.t,scales=list(x=list(log=T)))
-options(max.print = 1000)
-```
-
-
-Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Sin Transformar)
-```{r}
-# Incrementamos el número de lineas que muestra print
-options(max.print = 10000)
-# Usamos escala logaritmica en el eje x
-plot(credit.Train.rpart.nt,scales=list(x=list(log=T)))
-options(max.print = 1000)
-```
-
-
-
-
-Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Transformados)
-```{r}
-plot(credit.Train.rpart.t, metric = "Kappa")
-```
-
-
-Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Sin Transformar)
-```{r}
-plot(credit.Train.rpart.nt, metric = "Kappa")
-```
-
-
-
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el Gráfico de la distribucion de remuestreo
-```{r}
-resampleHist(credit.Train.rpart.t)
-```
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el Gráfico de la distribucion de remuestreo
-```{r}
-resampleHist(credit.Train.rpart.nt)
-```
-
-
-
-Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prácticamente el mismo.
-
-
-### Modelo RF
-
-La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
-
-
-En este caso se ha obtenido un mejor resultado con los datos transformados.
-
-
-
-Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Transformados)
-```{r}
-# Incrementamos el número de lineas que muestra print
-options(max.print = 10000)
-# Usamos escala logaritmica en el eje x
-plot(credit.Train.rf.t,scales=list(x=list(log=T)))
-options(max.print = 1000)
-```
-
-
-Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Sin Transformar)
-```{r}
-# Incrementamos el número de lineas que muestra print
-options(max.print = 10000)
-# Usamos escala logaritmica en el eje x
-plot(credit.Train.rf.nt,scales=list(x=list(log=T)))
-options(max.print = 1000)
-```
-
-
-
-
-Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Transformados)
-```{r}
-plot(credit.Train.rf.t, metric = "Kappa")
-```
-
-
-Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Sin Transformar)
-```{r}
-plot(credit.Train.rf.nt, metric = "Kappa")
-```
-
-
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el Gráfico de la distribucion de remuestreo
-
-```{r}
-resampleHist(credit.Train.rf.t)
-```
-
-Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el Gráfico de la distribucion de remuestreo
-
-```{r}
-resampleHist(credit.Train.rf.nt)
-```
-
-
-Ambos resultados son muy parecidos.
-
-
-
-## 5.2. Decidir justificadamente el modelo final
 
 Comparamos todos los modelos entre ellos.
 
@@ -1184,8 +911,66 @@ densityplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free"),
 y = list(relation = "free")), auto.key = list(columns = 4), pch = "|")
 bwplot(credit.Train.Resamp.Acc, metric = "Accuracy")
 
+dotplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free")), between = list(x = 2))
+
 
 ```
+
+
+### Modelo GBM (Stochastic Gradient Boosting)
+
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
+
+
+Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
+
+Aunque el modelo gbm ha obtenido el mayor accuracy otra vez, se puede observar una disminución del valor con respecto al caso anterior.
+
+
+
+Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prácticamente el mismo.
+
+
+
+### Modelo GLM
+
+Ya que GLM no tiene hiper-parametros, no existe una mejor configuracion.Aun así, el mejor resultado es la siguiente.
+
+Observamos que para los datos sin transformar se obtine un resultado ligeramente superior.
+
+
+Como hemos dicho antes, al no existir hiper-parametros no se puede dibujar ninguna grafica que contemple cambios enrte los resultados y los parametros. Pero si es posible dibujar el Gráfico de la distribuciond e remuestreo:
+
+
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el Gráfico de la distribucion de remuestreo
+
+Ambos son muy similares.
+
+
+### Modelo RPART
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
+
+
+Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
+
+Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prácticamente el mismo.
+
+
+### Modelo RF
+
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
+
+
+En este caso se ha obtenido un mejor resultado con los datos transformados.
+
+Ambos resultados son muy parecidos.
+
+
+
+## 5.2. Decidir justificadamente el modelo final
+
+
 
 
 
