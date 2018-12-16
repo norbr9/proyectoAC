@@ -690,10 +690,22 @@ Ahora que tenemos el preprocesado de datos hecho, pasaremos al entrenamiento de 
 ## 4.1. Escoger varios modelos/técnicas a comparar
 
 
-### Modelo GLM (Generalized Linear Model)
+### 4.1.1. Modelo GLM (Generalized Linear Model)
 
 
-### Modelo GBM (Stochastic Gradient Boosting)
+
+### 4.1.2. Modelo RPART
+
+El algoritmo CART de árboles de decisión de clasificación y regresión.
+Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función train, como lo visto en clase vamos a decirdidr que el número de combinaciones a probar sea 10.
+
+### 4.1.3. Modelo RF
+
+El algoritmo CART de árboles de decisión de clasificación y regresión.
+Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función train, como lo visto en clase vamos a decirdidr que el número de combinaciones a probar sea 10.
+
+### 4.1.4. Modelo GBM (Stochastic Gradient Boosting)
+
 El modelo GBM o Potenciacion del gradiente, es una técnica de machine learning utilizada para problemas de analisis de regresion y clasificación estadistica. Esta técnica produce un modelo predictivo en forma de conjunto de modelos de predicción débiles, normalmente árboles de decisión. El modelo se construye de forma escalonada como lo hacen otros métodos de boosting, es decir, los predictores no se forman de manerera independiente, si no, de manera secuencial.
 
 
@@ -710,21 +722,35 @@ Calcularemos las semillas para usarlas en la función trainControl que pasaremos
 ## 4.2. Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
 
 
-###Modelo RPART
+### 4.2.1. Modelo GLM
 
-El algoritmo CART de árboles de decisión de clasificación y regresión.
-Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función train, como lo visto en clase vamos a decirdidr que el número de combinaciones a probar sea 10.
-
-
-### Modelo GLM
 El modelo glm no tiene hiper-parametros por lo que no se puede modficar nada
+
 ```{r}
 modelLookup("glm")
 ```
 
+### 4.2.2. Modelo RPART
 
-### Modelo GBM (Stochastic Gradient Boosting)
+El modelo rpart
+
+```{r}
+modelLookup("rpart")
+```
+
+### 4.2.3. Modelo RF
+
+El modelo rf
+
+```{r}
+modelLookup("rf")
+```
+
+
+### 4.2.4. Modelo GBM (Stochastic Gradient Boosting)
+
 Encontramos los hiperparametros para este modelo:
+
 ```{r}
 modelLookup("gbm")
 ```
