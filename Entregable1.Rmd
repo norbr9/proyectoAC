@@ -715,136 +715,6 @@ Calcularemos las semillas para usarlas en la función trainControl que pasaremos
 El algoritmo CART de árboles de decisión de clasificación y regresión.
 Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función train, como lo visto en clase vamos a decirdidr que el número de combinaciones a probar sea 10.
 
-```{r, warning=FALSE}
-#results=hide para que no imprima los train
-
-set.seed(1234)
-# seedsLength es = (numero_repeticiones*numero_remuestreos)+1, seguiremos lo visto en clase y usaremos los valores: (3*10)+1
-seedsLength=31
-seeds <- vector(mode = "list", length = seedsLength)
-
-# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
-foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
-# combHParam es el número de combinaciones de hiper-parámetros a probar
-combHParam=100
-for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
-# Hay que crear una semilla ´unica para el modelo final a entrenar.
-seeds[[seedsLength+1]]<-sample.int(1000, 1)
-# TrainControl con seeds
-credit.Train.Control.rpart <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
-
-cl <- makeCluster(detectCores()-1)
-registerDoParallel(cl)
-
-set.seed(1234)
-credit.Train.rpart<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.rpart, tuneLength = 10)
-
-stopImplicitCluster()
-stopCluster(cl)
-registerDoSEQ()
-
-credit.Train.rpart
-
-```
-
-
-###Modelo RF
-
-```{r, warning=FALSE}
-#results=hide para que no imprima los train
-
-set.seed(1234)
-seedsLength=31
-seeds <- vector(mode = "list", length = seedsLength)
-
-# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
-foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
-# combHParam es el número de combinaciones de hiper-parámetros a probar
-combHParam=100
-for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
-# Hay que crear una semilla ´unica para el modelo final a entrenar.
-seeds[[seedsLength+1]]<-sample.int(1000, 1)
-# TrainControl con seeds
-credit.Train.Control.rf <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
-
-cl <- makeCluster(detectCores()-1)
-registerDoParallel(cl)
-
-set.seed(1234)
-credit.Train.rf<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.rf, tuneLength = 4)
-
-stopImplicitCluster()
-stopCluster(cl)
-registerDoSEQ()
-
-credit.Train.rf
-varImp(credit.Train.rf)
-
-```
-
-```{r, warning=FALSE}
-#results=hide para que no imprima los train
-
-set.seed(1234)
-seedsLength=31
-seeds <- vector(mode = "list", length = seedsLength)
-# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
-foldIndexes<-createMultiFolds(credit.Datos.Train[[credit.Var.Salida.Usada]],k=10,times=3)
-# combHParam es el número de combinaciones de hiper-parámetros a probar
-combHParam=100
-for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
-# Hay que crear una semilla ´unica para el modelo final a entrenar.
-seeds[[seedsLength+1]]<-sample.int(1000, 1)
-# TrainControl con seeds
-credit.Train.Control.rf2 <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
-
-cl <- makeCluster(detectCores()-1)
-registerDoParallel(cl)
-
-set.seed(1234)
-credit.Train.rf2<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.rf2, tuneLength = 4)
-
-stopImplicitCluster()
-stopCluster(cl)
-registerDoSEQ()
-
-credit.Train.rf2
-varImp(credit.Train.rf2)
-
-```
-
-```{r, warning=FALSE}
-#results=hide para que no imprima los train
-
-set.seed(1234)
-seedsLength=31
-seeds <- vector(mode = "list", length = seedsLength)
-
-# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
-foldIndexes<-createMultiFolds(credit.Datos.Train[[credit.Var.Salida.Usada]],k=10,times=3)
-# combHParam es el número de combinaciones de hiper-parámetros a probar
-combHParam=100
-for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
-# Hay que crear una semilla ´unica para el modelo final a entrenar.
-seeds[[seedsLength+1]]<-sample.int(1000, 1)
-# TrainControl con seeds
-credit.Train.Control.rf3 <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
-
-cl <- makeCluster(detectCores()-1)
-registerDoParallel(cl)
-
-set.seed(1234)
-credit.Train.rf3<-train(credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Usadas], credit.Datos.Train.Transf.CS.BC[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.rf3, tuneLength = 4)
-
-stopImplicitCluster()
-stopCluster(cl)
-registerDoSEQ()
-
-credit.Train.rf3
-varImp(credit.Train.rf3)
-
-```
-
 
 ### Modelo GLM
 El modelo glm no tiene hiper-parametros por lo que no se puede modficar nada
@@ -876,6 +746,10 @@ credit.Train.gbm.grid <- expand.grid(
 
 ## 4.3. Probar, al menos, un mismo modelo/técnica con 2 preprocesos de datos diferentes
 
+### 4.3.1 Modelos con datos sin transformar
+
+En este entrenamiento usaremos el conjunto de datos de credit.Datos.Train, que solo tiene tratando los outliners y nulos.
+
 ```{r}
 #library(doParallel)
 
@@ -886,16 +760,19 @@ seeds <- vector(mode = "list", length = seedsLength)
 
 # Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
 foldIndexes<-createMultiFolds(credit.Datos.Train[[credit.Var.Salida.Usada]],k=10,times=3)
+
 # combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
 combHParam=100
 for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
 #H ay que crear una semilla ´unica para el modelo final a entrenar.
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
+
 # TrainControl con seeds
 credit.Train.Control.gbm <- trainControl(method = "repeatedcv", number = 10, repeats = 3, verboseIter=T, returnResamp = "all") # Guardamos todo para hacer diagramas
 
-
 credit.Train.Control.glm <- trainControl(method = "repeatedcv",number = 10,repeats = 3  ,verboseIter=F,returnResamp = "all" ,seeds = seeds )
+
+credit.Train.Control.todos <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds )
 
 
 # Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
@@ -903,11 +780,21 @@ cl <- makeCluster(detectCores()-1)
 registerDoParallel(cl)
 
 #Ejecutar Modelos
+#Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.glm, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.todos, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
+#Modelo glm
 set.seed(1234)
-credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.glm)
+credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.todos)
+
+#Modelo RF con tuneLength
+set.seed(1234)
+credit.Train.rf2<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.todos, tuneLength = 4)
+
+#Modelo RF con tuneLength
+set.seed(1234)
+credit.Train.rpart<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.todos, tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
@@ -917,6 +804,8 @@ registerDoSEQ()
 
 credit.Train.gbm
 credit.Train.glm
+credit.Train.rf
+credit.Train.rpart
 
 ```
 
@@ -951,6 +840,61 @@ resampleHist(credit.Train.gbm)
 ```
 
 
+### 4.3.2 Modelos con datos transformados
+
+En este entrenamiento usaremos el conjunto de datos de credit.Train.Preprocesado, donde eliminamos y creamos variables y transformamos las que tenía.
+
+```{r}
+set.seed(1234)
+seedsLength=31
+seeds <- vector(mode = "list", length = seedsLength)
+
+# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
+foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
+
+# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
+combHParam=100
+for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
+#H ay que crear una semilla ´unica para el modelo final a entrenar.
+seeds[[seedsLength+1]]<-sample.int(1000, 1)
+
+# TrainControl con seeds
+credit.Train.Control.todos <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
+
+
+# Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
+cl <- makeCluster(detectCores()-1)
+registerDoParallel(cl)
+
+#Ejecutar Modelos
+#Modelo gbm con tuneGrid
+set.seed(1234)
+credit.Train.gbm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.todos, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+
+#Modelo glm
+set.seed(1234)
+credit.Train.glm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.todos)
+
+#Modelo RF con tuneLength
+set.seed(1234)
+credit.Train.rf2<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.todos, tuneLength = 4)
+
+#Modelo RPART con tuneLength
+set.seed(1234)
+credit.Train.rpart<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.todos, tuneLength = 10)
+
+
+# Volvemos al modo no paralelo
+stopImplicitCluster()
+stopCluster(cl)
+registerDoSEQ()
+
+credit.Train.gbm
+credit.Train.glm
+credit.Train.rf
+credit.Train.rpart
+
+```
 
 
 
