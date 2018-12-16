@@ -827,17 +827,32 @@ credit.Train.rpart<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit
 stopImplicitCluster()
 stopCluster(cl)
 registerDoSEQ()
-
-credit.Train.gbm
-credit.Train.glm
-credit.Train.rf
-credit.Train.rpart
-
 ```
 
 
+Y aquí los mejores resultados de cada modelo:
+```{r}
+credit.Train.gbm$bestTune
+max(credit.Train.gbm$results$Accuracy)
+
+
+#glm no tiene hiper-parametros
+max(credit.Train.glm$results$Accuracy)
+
+
+credit.Train.rf2$bestTune
+max(credit.Train.rf2$results$Accuracy)
+
+credit.Train.rpart$bestTune
+max(credit.Train.rpart$results$Accuracy)
+
+```
+
+Se puede observar que GBM ha conseguido un mejor resultado
+
+
 ### Modelo GBM (Stochastic Gradient Boosting)
-La mejor combiancion de hiper-parametros y el mejor resultado es el siguiente:
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente:
 ```{r}
 credit.Train.gbm$bestTune
 max(credit.Train.gbm$results$Accuracy)
@@ -923,12 +938,27 @@ stopImplicitCluster()
 stopCluster(cl)
 registerDoSEQ()
 
-credit.Train.gbm
-credit.Train.glm
-credit.Train.rf
-credit.Train.rpart
+```
+
+Y aquí los mejores resultados de cada modelo:
+```{r}
+credit.Train.gbm$bestTune
+max(credit.Train.gbm$results$Accuracy)
+
+
+#glm no tiene hiper-parametros
+max(credit.Train.glm$results$Accuracy)
+
+
+credit.Train.rf2$bestTune
+max(credit.Train.rf2$results$Accuracy)
+
+credit.Train.rpart$bestTune
+max(credit.Train.rpart$results$Accuracy)
 
 ```
+
+Se puede observar que GBM ha conseguido un mejor resultado
 
 
 
