@@ -925,45 +925,90 @@ Se puede observar que GBM ha conseguido el mejor resultado
 ## 5.1. Comparar el rendimiento de los diferentes modelos
 
 ### Modelo GBM (Stochastic Gradient Boosting)
-La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente:
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
+
+Para los datos transformados:
 ```{r}
-credit.Train.gbm$bestTune
-max(credit.Train.gbm$results$Accuracy)
+credit.Train.gbm.t$bestTune
+max(credit.Train.gbm.t$results$Accuracy)
+```
+
+Y sin transformar:
+
+```{r}
+credit.Train.gbm.nt$bestTune
+max(credit.Train.gbm.nt$results$Accuracy)
 ```
 
 
+Se puede observar que la configuracion de hiper-parametros es la misma para los 2. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
 
-Grafico de la precision del modelo frente a los hiper-parametros
+
+
+
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
 # Usamos escala logaritmica en el eje x
-plot(credit.Train.gbm,scales=list(x=list(log=T)))
+plot(credit.Train.gbm.t,scales=list(x=list(log=T)))
 options(max.print = 1000)
 ```
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
-plot(credit.Train.gbm, metric = "Kappa")
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.gbm.nt,scales=list(x=list(log=T)))
+options(max.print = 1000)
 ```
 
-Grafico de nivel, precision frente a hiper-parametros.
 
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
 ```{r}
-plot(credit.Train.gbm, plotType = "level")
+plot(credit.Train.gbm.t, metric = "Kappa")
 ```
 
 
-Grafico de densidad para Accuracy y Kappa del modelo final
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+```{r}
+plot(credit.Train.gbm.nt, metric = "Kappa")
+```
+
+
+
+Grafico de nivel, precision frente a hiper-parametros (Datos Transformados)
+
+```{r}
+plot(credit.Train.gbm.t, plotType = "level")
+```
+
+Grafico de nivel, precision frente a hiper-parametros (Datos Sin Transformar)
+
+```{r}
+plot(credit.Train.gbm.nt, plotType = "level")
+```
+
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
 Dibuja el grafico de la distribucion de remuestreo
 ```{r}
-resampleHist(credit.Train.gbm)
+resampleHist(credit.Train.gbm.t)
+```
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.gbm.nt)
 ```
 
 
 
-
+Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prácticamente el mismo.
 
 
 ## 5.2. Decidir justificadamente el modelo final
