@@ -774,7 +774,7 @@ for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
 #H ay que crear una semilla ´unica para el modelo final a entrenar.
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
 # TrainControl con seeds
-credit.TrainCtrl.3cv10.plRF <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
+credit.TrainCtrl.3cv10.plRF <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds) # Para usar ROC necesita calcular las classProbs
 
 ```
 
@@ -786,11 +786,143 @@ El algoritmo CART de árboles de decisión de clasificación y regresión
 
 ```
 
+### Modelo GLM (Generalized Linear Model)
+
+
+### Modelo GBM (Stochastic Gradient Boosting)
+El modelo GBM o Potenciacion del gradiente, es una técnica de machine learning utilizada para problemas de analisis de regresion y clasificación estadistica. Esta técnica produce un modelo predictivo en forma de conjunto de modelos de predicción débiles, normalmente árboles de decisión. El modelo se construye de forma escalonada como lo hacen otros métodos de boosting, es decir, los predictores no se forman de manerera independiente, si no, de manera secuencial.
+
+
+![Imagen de Baggin y Boosting](boosting.png)
+Bagging (independent models) & Boosting (sequential models). Reference: https://quantdare.com/what-is-the-difference-between-bagging-and-boosting/
+
+La principal diferencia entre Baggin y Boosting es que en Bagging se construye los predictores de manera independiente y luego se combinan y en el Boosting se construyen de manera dependediente y secuencialmente.
+
 
 
 ## Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
 
+### Modelo GLM
+El modelo glm no tiene hiper-parametros por lo que no se puede modficar nada
+```{r}
+modelLookup("glm")
+```
+
+
+### Modelo GBM (Stochastic Gradient Boosting)
+Encontramos los hiperparametros para este modelo:
+```{r}
+modelLookup("gbm")
+```
+
+
+Vemos que existen 4 hiper-parametros: n.trees, interaction.depth, shrinkage y n.minobsinnode.
+Estos serán los que modificaremos utilizando TuneGrid. Basicamente, TuneGrid hace posible que se pueda pasar una parrilla de combianciones a la función train().
+
+```{r}
+credit.Train.gbm.grid <- expand.grid(
+  n.trees=c(100,200,500,1000,2000),
+  shrinkage=c(0.01,0.05,0.1),
+  n.minobsinnode = c(3,5,10,15),
+  interaction.depth=c(1,2,5,10)
+)
+```
+
+
+
 ## Probar, al menos, un mismo modelo/técnica con 2 preprocesos de datos diferentes
+
+```{r}
+library(doParallel)
+
+set.seed(1234) ## Para la repetición de la ejecución de los modelos
+# seedsLength es = (numero_repeticiones*numero_remuestreos)+1, seguiremos lo visto en clase y usaremos los valores: (3*10)+1
+seedsLength=31
+seeds <- vector(mode = "list", length = seedsLength)
+
+# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
+foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
+# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
+# en el ejemplo,para random forest, solo se var´ıa por defecto el hiperparámetro mtry
+# para este problema se prueba mtry={2,5,8}, es decir, 3 combinaciones diferentes.
+combHParam=3
+for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
+#H ay que crear una semilla ´unica para el modelo final a entrenar.
+seeds[[seedsLength+1]]<-sample.int(1000, 1)
+# TrainControl con seeds
+credit.Train.Control.gbm <- trainControl(
+    method = "repeatedcv",number = 10
+  ,repeats = 3
+  ## con 3 repeticiones
+  ,verboseIter=F
+  ,returnResamp = "all" # Guardamos todo para hacer diagramas
+  )
+
+credit.Train.Control.glm <- trainControl(
+    method = "repeatedcv",number = 10
+  ,repeats = 3
+  ## con 3 repeticiones
+  ,verboseIter=F
+  ,returnResamp = "all" # Guardamos todo para hacer diagramas
+  ,seeds = seeds
+  )
+
+
+# Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
+cl <- makeCluster(detectCores()-1)
+registerDoParallel(cl)
+
+#Ejecutar Modelos
+set.seed(1234)
+credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+           credit.Datos.Train[[credit.Var.Salida.Usada]],
+           method = 'gbm',trControl = credit.Train.Control.gbm ,tuneGrid = credit.Train.gbm.grid)
+
+
+set.seed(1234)
+credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+           credit.Datos.Train[[credit.Var.Salida.Usada]],
+           method = 'glm',trControl = credit.Train.Control.glm)
+
+
+# Volvemos al modo no paralelo
+stopImplicitCluster()
+stopCluster(cl)
+registerDoSEQ()
+
+```
+
+
+### Modelo GBM (Stochastic Gradient Boosting)
+Grafico de la precision del modelo frente a los hiper-parametros
+```{r}
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.gbm,scales=list(x=list(log=T)))
+options(max.print = 1000)
+```
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros
+```{r}
+plot(credit.Train.gbm, metric = "Kappa")
+```
+
+Grafico de nivel, precision frente a hiper-parametros.
+
+```{r}
+plot(credit.Train.gbm, plotType = "level")
+```
+
+
+Grafico de densidad para Accuracy y Kappa del modelo final
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.gbm)
+```
+
+
 
 
 
