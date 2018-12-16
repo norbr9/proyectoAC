@@ -601,7 +601,9 @@ El cambio de escala se aplica a las variables para normalizarlas y ponerlas toda
 
 ```{r}
 # Semilla de números aleatorios
-#set.seed(1234) -> no necesario, Eso lo usas cuando quieres que se pueda repetir el experimento tal cual lo has hecho, Escalar el conjunto de datos siempre lo va a hacer igual
+# set.seed(1234) -> no necesario, Eso lo usas cuando quieres que se pueda repetir
+# el experimento tal cual lo has hecho, Escalar el conjunto de datos siempre
+# lo va a hacer igual
 
 # Dataset a utilizar. Sus variables de entrada y salida.
 # Variable a predecir, variables de entrada a usar y variables que se escalarán.
@@ -628,10 +630,13 @@ Ahora podemos ver el efecto del escalado sobre las variables de entrada y compro
 VarToPlot<-credit.Vars.Entrada.Escaladas
 d1<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F,xlim = c(-2,4),ylim = c(0,5),xlab = "Valores Variables Entrada")
+  data=credit.Datos.Train,main="Variables sin Normalizar",
+  plot.points=F,xlim = c(-2,4),ylim = c(0,5),
+  xlab = "Valores Variables Entrada")
 d2<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train.Transf.CS, main="Variables Normalizadas",plot.points=F, xlab = "Valores Variables Entrada", xlim = c(-2,4))
+  data=credit.Datos.Train.Transf.CS, main="Variables Normalizadas",
+  plot.points=F, xlab = "Valores Variables Entrada", xlim = c(-2,4))
 # Gráficos en blanco y negro (mejor para imprimir)
 trellis.par.set(theme = standard.theme("pdf",color=FALSE))
 print(d1,position=c(0,0,0.5,1),more=T)
@@ -652,7 +657,8 @@ Observando las gráficas anteriores podemos darnos cuenta de la asimetría que e
 
 ```{r, warning=FALSE}
 
-credit.preProc.CS.Mod.YJ<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "YeoJohnson"))
+credit.preProc.CS.Mod.YJ<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas],
+                                     method=c("center","scale", "YeoJohnson"))
 
 # Obtenemos la transformación
 credit.Datos.Train.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Train)
@@ -661,11 +667,13 @@ credit.Datos.Test.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Te
 
 d1<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F, xlab = "Valores Variables Entrada", xlim = c(0,8))
+  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F, 
+  xlab = "Valores Variables Entrada", xlim = c(0,8))
 
 d3<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train.Transf.CS.YJ, main="Variables Aplicado YJ",plot.points=F, xlab = "Valores Variables Entrada")
+  data=credit.Datos.Train.Transf.CS.YJ, main="Variables Aplicado YJ",plot.points=F,
+  xlab = "Valores Variables Entrada")
 
 trellis.par.set(theme = standard.theme("pdf",color=FALSE))
 print(d1,position=c(0,0,0.5,1),more=T)
@@ -684,15 +692,23 @@ Como no queremos perder información que puede ser relevante no vamos a aplicar 
 
 ```{r, warning=FALSE}
 # Ejemplo de crear nuevas variables con Class Distribution
-credit.preProc.ClssDtrb.Mod<-classDist(credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas],credit.Datos.Train.Transf.CS.YJ[,15])
+credit.preProc.ClssDtrb.Mod<-classDist(credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]
+                                       ,credit.Datos.Train.Transf.CS.YJ[,15])
 # A~nadimos las nuevas variables
-credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.YJ,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
-credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.YJ,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Test.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
+credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.YJ,
+                      predict(credit.preProc.ClssDtrb.Mod,
+                      credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
+credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.YJ,
+                      predict(credit.preProc.ClssDtrb.Mod,
+                      credit.Datos.Test.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
 
 # Dibujamos las nuevas variables y las antiguas
-p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod, credit.xtra.Vars[credit.Vars.Entrada.Escaladas]), credit.xtra.Vars[,15],plot="ellipse")
+p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod,
+                credit.xtra.Vars[credit.Vars.Entrada.Escaladas]),
+                credit.xtra.Vars[,15],plot="ellipse")
 
-p2<-featurePlot(x=credit.xtra.Vars[credit.Vars.Entrada.Escaladas], credit.xtra.Vars[,15],plot="ellipse")
+p2<-featurePlot(x=credit.xtra.Vars[credit.Vars.Entrada.Escaladas],
+                credit.xtra.Vars[,15],plot="ellipse")
 
 print(p1,position=c(0,0,0.5,1),more=T)
 print(p2,position=c(0.5,0,1,1))
@@ -807,7 +823,8 @@ En este entrenamiento usaremos el conjunto de datos de credit.Datos.Train, que s
 
 ```{r}
 set.seed(1234) ## Para la repetición de la ejecución de los modelos
-# seedsLength es = (numero_repeticiones*numero_remuestreos)+1, seguiremos lo visto en clase y usaremos los valores: (3*10)+1
+# seedsLength es = (numero_repeticiones*numero_remuestreos)+1,
+# seguiremos lo visto en clase y usaremos los valores: (3*10)+1
 seedsLength=31
 seeds <- vector(mode = "list", length = seedsLength)
 
@@ -821,7 +838,8 @@ for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
 
 # TrainControl con seeds
-credit.Train.Control.CV1 <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
+credit.Train.Control.CV1 <- trainControl(method = "repeatedcv",number=10,
+                          repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds)
 
 
 # Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
@@ -831,20 +849,30 @@ registerDoParallel(cl)
 #Ejecutar Modelos
 #Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV1, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm',
+                           trControl=credit.Train.Control.CV1,
+                           tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
 #Modelo glm
 set.seed(1234)
-credit.Train.glm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV1)
+credit.Train.glm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+                           credit.Datos.Train[[credit.Var.Salida.Usada]], 
+                           method='glm', trControl = credit.Train.Control.CV1)
 
 #Modelo RF con tuneLength
 set.seed(1234)
 
-credit.Train.rf.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', verbose=F, trControl=credit.Train.Control.CV1, tuneLength = 4)
+credit.Train.rf.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+                          credit.Datos.Train[[credit.Var.Salida.Usada]],
+                          method='rf', verbose=F, trControl=credit.Train.Control.CV1,
+                          tuneLength = 4)
 
 #Modelo RPART con tuneLength
 set.seed(1234)
-credit.Train.rpart.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV1, tuneLength = 10)
+credit.Train.rpart.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas],
+                             credit.Datos.Train[[credit.Var.Salida.Usada]],
+                             method='rpart',
+                             trControl=credit.Train.Control.CV1, tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
@@ -875,7 +903,9 @@ for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
 
 # TrainControl con seeds
-credit.Train.Control.CV2 <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
+credit.Train.Control.CV2 <- trainControl(method = "repeatedcv",number=10,
+                            repeats=3, verboseIter=F, returnResamp = "all",
+                            seeds=seeds )
 
 
 # Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
@@ -885,20 +915,34 @@ registerDoParallel(cl)
 #Ejecutar Modelos
 #Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV2, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                          credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                          method='gbm', trControl=credit.Train.Control.CV2, 
+                          tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
 #Modelo glm
 set.seed(1234)
-credit.Train.glm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV2)
+credit.Train.glm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                          credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                          method='glm', 
+                          trControl = credit.Train.Control.CV2)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', verbose=F, trControl=credit.Train.Control.CV2, tuneLength = 4)
+credit.Train.rf.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                         credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                         method='rf', 
+                         verbose=F, trControl=credit.Train.Control.CV2, 
+                         tuneLength = 4)
 
 
 #Modelo RPART con tuneLength
 set.seed(1234)
-credit.Train.rpart.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV2, tuneLength = 10)
+credit.Train.rpart.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
+                            credit.Train.Preprocesado[[credit.Var.Salida.Usada]],
+                            method='rpart', 
+                            trControl=credit.Train.Control.CV2, 
+                            tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
