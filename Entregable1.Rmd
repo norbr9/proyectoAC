@@ -22,7 +22,7 @@ library(ellipse)
 library(doParallel)
 library(rpart)
 library(gbm)
-
+library(MLmetrics)
 ```
 
 
@@ -603,7 +603,7 @@ Ahora podemos ver el efecto del escalado sobre las variables de entrada y compro
 VarToPlot<-credit.Vars.Entrada.Escaladas
 d1<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F,xlim = c(0,8),xlab = "Valores Variables Entrada")
+  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F,xlim = c(-2,4),ylim = c(0,5),xlab = "Valores Variables Entrada")
 d2<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
   data=credit.Datos.Train.Transf.CS, main="Variables Normalizadas",plot.points=F, xlab = "Valores Variables Entrada", xlim = c(-2,4))
@@ -690,6 +690,12 @@ Ahora que tenemos el preprocesado de datos hecho, pasaremos al entrenamiento de 
 
 
 ### 4.1.1. Modelo GLM (Generalized Linear Model)
+El Modelo GlM es una generalizacion flexible de una regresion lineal. Esta, permite variables de respuesta que tienen modelos de distribución de errores distintos de una distribución normal.
+
+Existen 3 componentes en un modelo GLM:
+Random Component: Distribucion de probabildiad de las variables de respuesta.
+Systematic Component: La combinacion lineal de variables en el modelo que sirven para crear un predictor lineal.
+Link Function, η or g(μ): Especifica la union entre random component y Systematic Compononet.
 
 
 
@@ -929,13 +935,69 @@ dotplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free")), betw
   Con lo descrito y basándonos en las comparaciones decidimos que nos quedamos como modelo final el gbm aplicado sobre los datos transformados, ya que en ocasiones puede dar mejores resultados que el modelo gbm sobre los datos no tratados.
 
 
+
 ## 5.3. Evaluar el rendimiento futuro del modelo final
 
+Vamos a evaluar el rendimiento para el modelo GBM:
+
+```{r}
+# Prediciendo los valores del conjunto Test (nunca vistos)
+preds<-predict(credit.Train.gbm.t,
+newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas])
+# Reordenamos los niveles para que la clase positiva (pos) sea el primero
+preds.ord<-factor(preds,levels(preds)[c(2,1)])
+predsProbs<-predict(credit.Train.gbm.nt,
+newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas],
+type="prob")
 
 
 
+```
 
 
+```{r}
+postResample(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]])
+# Reordenamos los niveles para que pos(itivo) sea el primero
+obs.ord<-credit.Test.Preprocesado[[credit.Var.Salida.Usada]]
+obs.ord<-factor(obs.ord,levels(obs.ord)[c(2,1)])
+# Datos para twoClassSummary
+data2ClassSum<-data.frame(pred=preds.ord,obs=obs.ord,
+pos=predsProbs["+"])
+dataMnLogLoss<-data.frame(pred=preds.ord,obs=obs.ord,
+pos=predsProbs["+"],neg=predsProbs["-"])
+
+#twoClassSummary(data2ClassSum,lev=levels(obs.ord))
+prSummary(data2ClassSum,lev=levels(obs.ord))
+#mnLogLoss(dataMnLogLoss,lev=levels(obs.ord))
+# Calcula datos para lift y calibration curves
+lift_results <- data.frame(Class = obs.ord)
+lift_results$GBM <- predict(credit.Train.gbm.nt,
+credit.Test.Preprocesado[credit.Vars.Entrada.Usadas], type = "prob")[,"+"]
+trellis.par.set(caretTheme())
+# Calcula lift curves
+lift_obj <- lift(Class ~ GBM, data = lift_results)
+plot(lift_obj, values = 60, auto.key = list(columns = 3,
+lines = TRUE,
+points = FALSE))
+# Calcula calibration curves
+cal_obj <- calibration(Class ~ GBM, data = lift_results,
+cuts = 13)
+plot(cal_obj, type = "l", auto.key = list(columns = 3,
+lines = TRUE,
+points = FALSE))
+
+```
+
+
+```{r}
+# Usamos el parámetro positive="pos" porque sino usa como positive el primer
+# nivel que encuentra (que en este caso es "neg")
+caret::confusionMatrix(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]],
+positive="+")
+```
+
+
+Se ha obtenido un 74% de accuracy. Es decir un 74% de los datos de prueba se han clasificado correctamente.
 
 
 
@@ -943,6 +1005,16 @@ dotplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free")), betw
 # 6. Bibliografía
 
 Análisis de datos y machine learning con R (caret) - Sesiones de prácticas de Aprendizaje Computacional
+
+<https://www.stat.umn.edu/arc/yjpower.pdf>
+
+<https://onlinecourses.science.psu.edu/stat504/node/216/>
+
+https://stats.stackexchange.com/questions/27651/how-would-you-explain-generalized-linear-models-to-people-with-no-statistical-ba
+
+<https://www.jstatsoft.org/article/view/v028i05/v28i05.pdf>
+
+<https://medium.com/mlreview/gradient-boosting-from-scratch-1e317ae4587d>
 
 <https://www.stat.umn.edu/arc/yjpower.pdf>
 
