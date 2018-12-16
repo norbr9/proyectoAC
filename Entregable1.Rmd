@@ -693,9 +693,9 @@ Ahora que tenemos el preprocesado de datos hecho, pasaremos al entrenamiento de 
 El Modelo GlM es una generalizacion flexible de una regresion lineal. Esta, permite variables de respuesta que tienen modelos de distribución de errores distintos de una distribución normal.
 
 Existen 3 componentes en un modelo GLM:
-Random Component: Distribucion de probabildiad de las variables de respuesta.
-Systematic Component: La combinacion lineal de variables en el modelo que sirven para crear un predictor lineal.
-Link Function, η or g(μ): Especifica la union entre random component y Systematic Compononet.
+* Random Component: Distribucion de probabildiad de las variables de respuesta.
+* Systematic Component: La combinacion lineal de variables en el modelo que sirven para crear un predictor lineal.
+* Link Function, η or g(μ): Especifica la union entre random component y Systematic Compononet.
 
 
 
