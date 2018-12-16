@@ -980,71 +980,7 @@ Comparamos todos los modelos entre ellos.
 
 ## 5.3. Evaluar el rendimiento futuro del modelo final
 
-Vamos a evaluar el rendimiento para el modelo GBM, con los datos procesados y sin procesar
-
-Para los datos sin procesar:
-
-```{r}
-# Prediciendo los valores del conjunto Test (nunca vistos)
-preds<-predict(credit.Train.gbm.nt,
-newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas])
-# Reordenamos los niveles para que la clase positiva (pos) sea el primero
-preds.ord<-factor(preds,levels(preds)[c(2,1)])
-predsProbs<-predict(credit.Train.gbm.nt,
-newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas],
-type="prob")
-
-
-
-```
-
-
-```{r}
-postResample(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]])
-# Reordenamos los niveles para que pos(itivo) sea el primero
-obs.ord<-credit.Test.Preprocesado[[credit.Var.Salida.Usada]]
-obs.ord<-factor(obs.ord,levels(obs.ord)[c(2,1)])
-# Datos para twoClassSummary
-data2ClassSum<-data.frame(pred=preds.ord,obs=obs.ord,
-pos=predsProbs["+"])
-dataMnLogLoss<-data.frame(pred=preds.ord,obs=obs.ord,
-pos=predsProbs["+"],neg=predsProbs["-"])
-
-#twoClassSummary(data2ClassSum,lev=levels(obs.ord))
-prSummary(data2ClassSum,lev=levels(obs.ord))
-#mnLogLoss(dataMnLogLoss,lev=levels(obs.ord))
-# Calcula datos para lift y calibration curves
-lift_results <- data.frame(Class = obs.ord)
-lift_results$GBM <- predict(credit.Train.gbm.nt,
-credit.Test.Preprocesado[credit.Vars.Entrada.Usadas], type = "prob")[,"+"]
-trellis.par.set(caretTheme())
-# Calcula lift curves
-lift_obj <- lift(Class ~ GBM, data = lift_results)
-plot(lift_obj, values = 60, auto.key = list(columns = 3,
-lines = TRUE,
-points = FALSE))
-# Calcula calibration curves
-cal_obj <- calibration(Class ~ GBM, data = lift_results,
-cuts = 13)
-plot(cal_obj, type = "l", auto.key = list(columns = 3,
-lines = TRUE,
-points = FALSE))
-
-```
-
-
-```{r}
-# Usamos el parámetro positive="pos" porque sino usa como positive el primer
-# nivel que encuentra (que en este caso es "neg")
-caret::confusionMatrix(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]],
-positive="+")
-```
-
-Obtenemos un accuaracy bastante bajo de tan solo un 60%. Es decir solo un 60% de los datos en el conjunto test se han clasificado correctamente.
-
-
-
-Para los datos procesados:
+Vamos a evaluar el rendimiento para el modelo GBM:
 
 ```{r}
 # Prediciendo los valores del conjunto Test (nunca vistos)
@@ -1103,7 +1039,8 @@ positive="+")
 ```
 
 
-Se ha obtenido un 74% de accuracy. Este es un resultado bastante mejor que con los datos sin procesar.
+Se ha obtenido un 74% de accuracy. Es decir un 74% de los datos de prueba se han clasificado correctamente.
+
 
 
 
