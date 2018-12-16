@@ -94,7 +94,7 @@ summary(credit[1], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)    
 porcent <- prop.table(table(credit$Male)) * 100
 cbind(total=table(credit$Male), porcentaje=porcent) 
-# Grafico de barras    
+# Gráfico de barras    
 barplot(table(credit$Male))
 
 ```
@@ -162,7 +162,7 @@ summary(credit[4], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$Married)) * 100                                                         #
 cbind(total=table(credit$Married), porcentaje=porcent)     
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$Married))           
 
 ```
@@ -177,7 +177,7 @@ summary(credit[5], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$BankCustomer)) * 100                                                         #
 cbind(total=table(credit$BankCustomer), porcentaje=porcent)   
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$BankCustomer))       
 
 ```
@@ -194,7 +194,7 @@ summary(credit[6], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$EducationLevel)) * 100                                                         #
 cbind(total=table(credit$EducationLevel), porcentaje=porcent)   
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$EducationLevel))     
 
 ```
@@ -210,7 +210,7 @@ summary(credit[7], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$Ethnicity)) * 100                                                         #
 cbind(total=table(credit$Ethnicity), porcentaje=porcent)   
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$Ethnicity))      
 
 ```
@@ -254,7 +254,7 @@ summary(credit[9], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$PriorDefaul)) * 100                                                         #
 cbind(total=table(credit$PriorDefaul), porcentaje=porcent)  
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$PriorDefaul))       
 
 ```
@@ -270,7 +270,7 @@ summary(credit[10], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$Employed)) * 100                                                        #
 cbind(total=table(credit$Employed), porcentaje=porcent)     
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$Employed))      
 
 ```
@@ -313,7 +313,7 @@ summary(credit[12], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$DriversLicense)) * 100                                                        #
 cbind(total=table(credit$DriversLicense), porcentaje=porcent)       
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$DriversLicense))           
 ```
 
@@ -327,7 +327,7 @@ summary(credit[13], maxsum = Inf)
 # Numero de ocurrencias (porcentaje)                                                                  #
 porcent <- prop.table(table(credit$Citizen)) * 100                                                        #
 cbind(total=table(credit$Citizen), porcentaje=porcent)  
-# Grafico de barras                                                                                   #
+# Gráfico de barras                                                                                   #
 barplot(table(credit$Citizen))               
 
 ```
@@ -949,7 +949,7 @@ Se puede observar que la configuracion de hiper-parametros es la misma para los 
 
 
 
-Grafico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+Gráfico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -959,7 +959,7 @@ options(max.print = 1000)
 ```
 
 
-Grafico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -971,40 +971,40 @@ options(max.print = 1000)
 
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
 ```{r}
 plot(credit.Train.gbm.t, metric = "Kappa")
 ```
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 plot(credit.Train.gbm.nt, metric = "Kappa")
 ```
 
 
 
-Grafico de nivel, precision frente a hiper-parametros (Datos Transformados)
+Gráfico de nivel, precision frente a hiper-parametros (Datos Transformados)
 
 ```{r}
 plot(credit.Train.gbm.t, plotType = "level")
 ```
 
-Grafico de nivel, precision frente a hiper-parametros (Datos Sin Transformar)
+Gráfico de nivel, precision frente a hiper-parametros (Datos Sin Transformar)
 
 ```{r}
 plot(credit.Train.gbm.nt, plotType = "level")
 ```
 
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.gbm.t)
 ```
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.gbm.nt)
 ```
@@ -1033,17 +1033,17 @@ max(credit.Train.glm.nt$results$Accuracy)
 Observamos que para los datos sin transformar se obtine un resultado ligeramente superior.
 
 
-Como hemos dicho antes, al no existir hiper-parametros no se puede dibujar ninguna grafica que contemple cambios enrte los resultados y los parametros. Pero si es posible dibujar el grafico de la distribuciond e remuestreo:
+Como hemos dicho antes, al no existir hiper-parametros no se puede dibujar ninguna grafica que contemple cambios enrte los resultados y los parametros. Pero si es posible dibujar el Gráfico de la distribuciond e remuestreo:
 
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.glm.t)
 ```
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.glm.nt)
 ```
@@ -1070,7 +1070,7 @@ max(credit.Train.gbm.nt$results$Accuracy)
 Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
 
 
-Grafico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+Gráfico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1080,7 +1080,7 @@ options(max.print = 1000)
 ```
 
 
-Grafico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1092,13 +1092,13 @@ options(max.print = 1000)
 
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
 ```{r}
 plot(credit.Train.rpart.t, metric = "Kappa")
 ```
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 plot(credit.Train.rpart.nt, metric = "Kappa")
 ```
@@ -1106,14 +1106,14 @@ plot(credit.Train.rpart.nt, metric = "Kappa")
 
 
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.rpart.t)
 ```
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.rpart.nt)
 ```
@@ -1144,7 +1144,7 @@ En este caso se ha obtenido un mejor resultado con los datos transformados.
 
 
 
-Grafico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+Gráfico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1154,7 +1154,7 @@ options(max.print = 1000)
 ```
 
 
-Grafico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1166,27 +1166,27 @@ options(max.print = 1000)
 
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
 ```{r}
 plot(credit.Train.rf.t, metric = "Kappa")
 ```
 
 
-Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 plot(credit.Train.rf.nt, metric = "Kappa")
 ```
 
 
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.rf.t)
 ```
 
-Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
-Dibuja el grafico de la distribucion de remuestreo
+Gráfico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el Gráfico de la distribucion de remuestreo
 ```{r}
 resampleHist(credit.Train.rf.nt)
 ```
