@@ -21,6 +21,7 @@ library(e1071)
 library(ellipse)
 library(doParallel)
 library(rpart)
+library(gbm)
 
 ```
 
@@ -739,41 +740,86 @@ añadir setseed(1234) para que se pueda volver a repetir
 ## Escoger varios modelos/técnicas a comparar
 
 Calcularemos las semillas para usarlas en la función trainControl que pasaremos al entrenamientod de los modelos
-```{r}
-#library(doParallel) -> necesaria en le momento de hacerlo paralelo
 
-set.seed(1234) ## Para la repetición de la ejecución de los modelos
+
+
+## Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
+
+
+###Modelo RPART
+
+El algoritmo CART de árboles de decisión de clasificación y regresión.
+Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función train, como lo visto en clase vamos a decirdidr que el número de combinaciones a probar sea 10.
+
+```{r, warning=FALSE}
+#results=hide para que no imprima los train
+
+set.seed(1234)
 # seedsLength es = (numero_repeticiones*numero_remuestreos)+1, seguiremos lo visto en clase y usaremos los valores: (3*10)+1
 seedsLength=31
 seeds <- vector(mode = "list", length = seedsLength)
 
 # Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
 foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
-# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
-# en el ejemplo,para random forest, solo se var´ıa por defecto el hiperparámetro mtry
-# para este problema se prueba mtry={2,5,8}, es decir, 3 combinaciones diferentes.
-combHParam=3
+# combHParam es el número de combinaciones de hiper-parámetros a probar
+combHParam=100
 for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
-#H ay que crear una semilla ´unica para el modelo final a entrenar.
+# Hay que crear una semilla ´unica para el modelo final a entrenar.
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
 # TrainControl con seeds
-credit.TrainCtrl.3cv10.plRF <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
+credit.Train.Control.rpart <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
+
+cl <- makeCluster(detectCores()-1)
+registerDoParallel(cl)
+
+set.seed(1234)
+credit.Train.rpart<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.rpart, tuneLength = 10)
+
+stopImplicitCluster()
+stopCluster(cl)
+registerDoSEQ()
+
+credit.Train.rpart
 
 ```
 
 
-###Modelo RPART
-El algoritmo CART de árboles de decisión de clasificación y regresión
 
-```{r}
+###Modelo RF
 
+```{r, warning=FALSE}
+#results=hide para que no imprima los train
 
+set.seed(1234)
+seedsLength=31
+seeds <- vector(mode = "list", length = seedsLength)
+
+# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
+foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
+# combHParam es el número de combinaciones de hiper-parámetros a probar
+combHParam=100
+for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
+# Hay que crear una semilla ´unica para el modelo final a entrenar.
+seeds[[seedsLength+1]]<-sample.int(1000, 1)
+# TrainControl con seeds
+credit.Train.Control.rf <- trainControl(method='repeatedcv', number = 10, repeats = 3, index = foldIndexes, seeds=seeds)
+
+cl <- makeCluster(detectCores()-1)
+registerDoParallel(cl)
+
+set.seed(1234)
+credit.Train.rf<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.rf, tuneLength = 4)
+
+stopImplicitCluster()
+stopCluster(cl)
+registerDoSEQ()
+
+credit.Train.rf
 
 ```
 
 
 
-## Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
 
 ## Probar, al menos, un mismo modelo/técnica con 2 preprocesos de datos diferentes
 
