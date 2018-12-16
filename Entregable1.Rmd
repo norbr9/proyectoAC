@@ -32,9 +32,9 @@ library(MLmetrics)
 
 # 2. Carga de la base de datos
 
+  Cuando cargamos la base de datos decidimos cambiarle el nombre a las variables para poder tener una mejor comprensión de los datos qeu tenemos que tratar.
 
 ```{r}
-
 credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data",
                     sep = ",", na.strings = "?", header = F)
 colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "EducationLevel", "Ethnicity",
@@ -65,7 +65,18 @@ colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "Educati
 
 ## 3.1. Analizar las variables 
 
+  Comenzaremos analizando las diferentes variables que nos ha proporcioado la base de datos descargada.
+  
+```{r}
+# Resumen de los todos los datos
+summary(credit)
+
+```
+
+
 ### 3.1.1. Análisis monovariable
+
+  Para tartar las variables numéricas utilizaremos la función qqplot.data con la que podremos dar una representación de los percentiles con respecto a los de una normal centrada en cero.
 
 ```{r, include=FALSE}
 
@@ -80,20 +91,14 @@ qqplot.data <- function (vec)
   ggplot(d, aes(sample = resids)) + stat_qq() + geom_abline(slope = slope,intercept = int)   
 }                                                                                               
 
-
-# Resumen de los todos los datos
-
-summary(credit)
-
 ```
-
 
 
 Las variables que vamos a analizar serán: 
 
 ```{r}
 
-#######Análisis variable Male #######
+####### Análisis variable Male #######
 # Variable No Numérica                                                                                
 # Resumen                          
 summary(credit[1], maxsum = Inf)
@@ -101,15 +106,15 @@ summary(credit[1], maxsum = Inf)
 porcent <- prop.table(table(credit$Male)) * 100
 cbind(total=table(credit$Male), porcentaje=porcent) 
 # Gráfico de barras    
-barplot(table(credit$Male))
+barplot(table(credit$Male), ylim = c(0,500))
 
 ```
 
+  Esta se trata de una variable no numérica, lo 
 
 
-
-```{r, include=FALSE}
-#######Análisis variable Age#######
+```{r}
+####### Análisis variable Age #######
 # Variable Continua  
 # Resumen    
 summary(credit[2], maxsum = Inf)                                                             
@@ -129,7 +134,7 @@ lines(dens)
 rug(jitter(credit$Age))                                         
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica y posibles valores atípicos
 boxplot(credit$Age,main="Age")                                       
-# Representacion de los percentiles con respecto a los de una normal centrada en cero 
+# Representación de los percentiles con respecto a los de una normal centrada en cero 
 qqplot.data(credit$Age)+ggtitle("Gráfica Q-Q para Age")
 
 ```
@@ -160,7 +165,7 @@ rug(jitter(credit$Debt))
 
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica y posibles valores atipicos  
 boxplot(credit$Debt,main="Debt")        
-# Representacion de los percentiles con respecto a los de una normal centrada en cero  
+# Representación de los percentiles con respecto a los de una normal centrada en cero  
 qqplot.data(credit$Debt)+ggtitle("Gráfica Q-Q para Debt")                                                
 ```
 
@@ -256,7 +261,7 @@ rug(jitter(credit$YearsEmployed))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$YearsEmployed,main="YearsEmployed")    
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$YearsEmployed)+ggtitle("Gráfica Q-Q para YearsEmployed")                                                 
                                                   
 ```
@@ -316,7 +321,7 @@ rug(jitter(credit$CreditScore))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$CreditScore,main="CreditScore")      
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$CreditScore)+ggtitle("Gráfica Q-Q para CreditScore")                                               #
 
 ```
@@ -377,7 +382,7 @@ rug(jitter(credit$ZipCode))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$ZipCode,main="ZipCode")             
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$ZipCode)+ggtitle("Gráfica Q-Q para ZipCode") 
 
 ```
@@ -409,7 +414,7 @@ rug(jitter(credit$Income))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$Income,main="Income")              
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income") 
 
 ```
@@ -998,7 +1003,7 @@ dotplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free")), betw
 
   Con los resultados del rendimiento en el apartado anterior, podemos ver que los entrenamientos que descatan son los que utilizan gbm (potenciación del gradiente), tanto con los datos básicos como con los preprocesados.
   
-  En el diagrama generado por la función dotplot() podemos ver claramente como los modelos gbm están entre el 72%~73% y el 76%~77% de aciertos, siendo los que queden por delante de los demás.
+  En el diagrama generado por la función dotplot(), podemos ver claramente como los modelos gbm están entre el 72%~73% y el 76%~77% de aciertos, siendo los que queden por delante de los demás.
   
   Si pasamos al diagrama devuelto por bwplt() obvervamos que algunas veces pueden llegar a alcanzar casi el 85% de aciertos. No podemos pasar por alto que el modelo rf aplicado sobre los datos transformados sobrepasa ese 85%, pero nos decantamos por los resultados mostrados por el Cleveland dot plot, ya que da el intervalo de confianza al 95% del rendimiento sobre los conjuntos de validación.
   
@@ -1082,7 +1087,7 @@ Análisis de datos y machine learning con R (caret) - Sesiones de prácticas de 
 
 <https://onlinecourses.science.psu.edu/stat504/node/216/>
 
-https://stats.stackexchange.com/questions/27651/how-would-you-explain-generalized-linear-models-to-people-with-no-statistical-ba
+<https://stats.stackexchange.com/questions/27651/how-would-you-explain-generalized-linear-models-to-people-with-no-statistical-ba>
 
 <https://www.jstatsoft.org/article/view/v028i05/v28i05.pdf>
 
