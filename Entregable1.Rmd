@@ -32,9 +32,9 @@ library(MLmetrics)
 
 # 2. Carga de la base de datos
 
+  Cuando cargamos la base de datos decidimos cambiarle el nombre a las variables para poder tener una mejor comprensión de los datos qeu tenemos que tratar.
 
 ```{r}
-
 credit <-read.table("http://archive.ics.uci.edu/ml/machine-learning-databases/credit-screening/crx.data",
                     sep = ",", na.strings = "?", header = F)
 colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "EducationLevel",
@@ -66,7 +66,18 @@ colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "Educati
 
 ## 3.1. Analizar las variables 
 
+  Comenzaremos analizando las diferentes variables que nos ha proporcioado la base de datos descargada.
+  
+```{r}
+# Resumen de los todos los datos
+summary(credit)
+
+```
+
+
 ### 3.1.1. Análisis monovariable
+
+  Para tartar las variables numéricas utilizaremos la función qqplot.data con la que podremos dar una representación de los percentiles con respecto a los de una normal centrada en cero.
 
 ```{r, include=FALSE}
 
@@ -81,20 +92,14 @@ qqplot.data <- function (vec)
   ggplot(d, aes(sample = resids)) + stat_qq() + geom_abline(slope = slope,intercept = int)   
 }                                                                                               
 
-
-# Resumen de los todos los datos
-
-summary(credit)
-
 ```
-
 
 
 Las variables que vamos a analizar serán: 
 
 ```{r}
 
-#######Análisis variable Male #######
+####### Análisis variable Male #######
 # Variable No Numérica                                                                                
 # Resumen                          
 summary(credit[1], maxsum = Inf)
@@ -102,15 +107,15 @@ summary(credit[1], maxsum = Inf)
 porcent <- prop.table(table(credit$Male)) * 100
 cbind(total=table(credit$Male), porcentaje=porcent) 
 # Gráfico de barras    
-barplot(table(credit$Male))
+barplot(table(credit$Male), ylim = c(0,500))
 
 ```
 
+  Esta se trata de una variable no numérica, lo 
 
 
-
-```{r, include=FALSE}
-#######Análisis variable Age#######
+```{r}
+####### Análisis variable Age #######
 # Variable Continua  
 # Resumen    
 summary(credit[2], maxsum = Inf)                                                             
@@ -130,7 +135,7 @@ lines(dens)
 rug(jitter(credit$Age))                                         
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica y posibles valores atípicos
 boxplot(credit$Age,main="Age")                                       
-# Representacion de los percentiles con respecto a los de una normal centrada en cero 
+# Representación de los percentiles con respecto a los de una normal centrada en cero 
 qqplot.data(credit$Age)+ggtitle("Gráfica Q-Q para Age")
 
 ```
@@ -162,7 +167,7 @@ rug(jitter(credit$Debt))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica
 # y posibles valores atipicos  
 boxplot(credit$Debt,main="Debt")        
-# Representacion de los percentiles con respecto a los de una normal centrada en cero  
+# Representación de los percentiles con respecto a los de una normal centrada en cero  
 qqplot.data(credit$Debt)+ggtitle("Gráfica Q-Q para Debt")                                                
 ```
 
@@ -258,7 +263,7 @@ rug(jitter(credit$YearsEmployed))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$YearsEmployed,main="YearsEmployed")    
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$YearsEmployed)+ggtitle("Gráfica Q-Q para YearsEmployed")                                                 
                                                   
 ```
@@ -318,7 +323,7 @@ rug(jitter(credit$CreditScore))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$CreditScore,main="CreditScore")      
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$CreditScore)+ggtitle("Gráfica Q-Q para CreditScore")                                               #
 
 ```
@@ -379,7 +384,7 @@ rug(jitter(credit$ZipCode))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$ZipCode,main="ZipCode")             
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$ZipCode)+ggtitle("Gráfica Q-Q para ZipCode") 
 
 ```
@@ -411,7 +416,7 @@ rug(jitter(credit$Income))
 # Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$Income,main="Income")              
-# Representacion de los percentiles con respecto a los de una normal centrada en cero                 
+# Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income") 
 
 ```
