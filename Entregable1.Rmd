@@ -95,7 +95,7 @@ qqplot.data <- function (vec)
 ```
 
 
-Las variables que vamos a analizar serán: Male, Age, 
+Las variables que vamos a analizar serán: Male, Age, Debt, Married
 
 ```{r}
 
@@ -121,6 +121,7 @@ barplot(table(credit$Male), ylim = c(0,500))
 summary(credit[2], maxsum = Inf)
 ```
 
+
 ```{r, results='hide'}
 # Numero de ocurrencias (porcentaje)     
 porcent <- prop.table(table(credit$Age)) * 100   
@@ -131,18 +132,21 @@ cbind(total=table(credit$Age), porcentaje=porcent)
 # Estimación de la fucnión de desidad de probabilidad          
 dens<-density(credit$Age,na.rm=T)                             
 hist(credit$Age,xlab="",main="Age",ylim=c(0,max(dens$y)*1.1),probability =T) 
-lines(dens)                                                                 
-# rug() apra la repersentacion de lso valores reales del atributo, bajo el eje x                      
-# jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
-# por si hubiese valores repetidos                                                                    
+lines(dens)                                                                                    
 rug(jitter(credit$Age))                                         
-# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica y posibles valores atípicos
+# Diagrama Box-Whisker. Información sobre la dispersión, asimetría estadística y posibles valores atípicos
 boxplot(credit$Age,main="Age")                                       
 qqplot.data(credit$Age)+ggtitle("Gráfica Q-Q para Age")
 
 ```
 
+  Para analizar las variables numéricas utilizaremos los diagramas de las funciones hist(), boxplot() y qqplot.data, para una representación más visual de la distrubición de los datos.
+  
+  Los tres diagramas presentados son una muestra de cómo afecta cuando la mayoría de los datos tienen valores bajos, pero existen unos pocos datos que tienen valores demasiado altos y hacen que la media sea más grande que la mediana.
 
+  En el boxplot() podemos ver más claramente que los datos más atípicos son aquellos que sobrepasan el valor de 60.
+  
+  La gráfica Q-Q sirve observar si los datos tiene una distribución normal, si ese fuese el caso se deberían asemejar a la línea dibujada, pero se ve que hay bastantes datos por encima. Esto complementa la conclusión que se alcanzó antes.
 
 
 
@@ -163,22 +167,18 @@ cbind(total=table(credit$Debt), porcentaje=porcent)
 # Histograma con frecuencias de aparición             
 # Estimación de la fucnion de desidad de probabilidad   
 dens<-density(credit$Debt,na.rm=T)                    
-hist(credit$Debt,xlab="",main="Debt",ylim=c(0,max(dens$y)*1.1),probability =T)    
+hist(credit$Debt,xlab="",main="Debt",ylim=c(0,0.25),probability =T)    
 lines(dens)                     
-rug(jitter(credit$Debt))                            
-
-
-# Diagrama Box-Whisker. Información sobre la dispersión, asimetróa estadística
-# y posibles valores atípicos  
+rug(jitter(credit$Debt))     
 boxplot(credit$Debt,main="Debt")        
-# Representación de los percentiles con respecto a los de una normal centrada en cero  
 qqplot.data(credit$Debt)+ggtitle("Gráfica Q-Q para Debt")                                                
 ```
 
+  Para la variable Debt podemos ver que la mediana volverá a ser más baja que la media. Los datos más atípicos son aquellos que sobrepasan el valor de 16. Y La gráfica Q-Q vemos que hay datos que se desvían mucho de la mayoría. Volvemos a tner indicios de que los datos no siguen una distribución normal. 
 
 
 ```{r}
-#######Análisis variable Married######
+####### Análisis variable Married ######
 # Variable No Numérica                                                                                   
 # Resumen                                                                                             
 summary(credit[4], maxsum = Inf)             
@@ -190,6 +190,7 @@ barplot(table(credit$Married))
 
 ```
 
+  En el diagrama de Married podemos observar que aunque existen 3 tipos diferentes de datos, uno de ellos no tiene casi representación, podría ser posible que al ocurrir esto el tipo I y el tipo Y deberían juntarse en uno solo, ya que no tiene mucho sentido tener una categoría y tan poca representación.
 
 
 ```{r}
@@ -218,7 +219,7 @@ summary(credit[6], maxsum = Inf)
 porcent <- prop.table(table(credit$EducationLevel)) * 100                                                         
 cbind(total=table(credit$EducationLevel), porcentaje=porcent)   
 # Gráfico de barras                                                                                   
-barplot(table(credit$EducationLevel))     
+barplot(table(credit$EducationLevel), ylim = c(0,140))     
 
 ```
 
@@ -264,8 +265,8 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$YearsEmployed))         
-# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
-# y posibles valores atipicos                                                                         
+# Diagrama Box-Whisker. Información sobre la dispersión, asimetría estadística                        
+# y posibles valores atípicoss                                                                         
 boxplot(credit$YearsEmployed,main="YearsEmployed")    
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$YearsEmployed)+ggtitle("Gráfica Q-Q para YearsEmployed")                                                 
@@ -324,8 +325,8 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$CreditScore))           
-# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
-# y posibles valores atipicos                                                                         
+# Diagrama Box-Whisker. Información sobre la dispersión, asimetría estadística                        
+# y posibles valores atípicoss                                                                         
 boxplot(credit$CreditScore,main="CreditScore")      
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$CreditScore)+ggtitle("Gráfica Q-Q para CreditScore")                                               #
@@ -385,8 +386,8 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$ZipCode))            
-# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
-# y posibles valores atipicos                                                                         
+# Diagrama Box-Whisker. Información sobre la dispersión, asimetría estadística                        
+# y posibles valores atípicoss                                                                         
 boxplot(credit$ZipCode,main="ZipCode")             
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$ZipCode)+ggtitle("Gráfica Q-Q para ZipCode") 
@@ -417,8 +418,8 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$Income))     
-# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
-# y posibles valores atipicos                                                                         
+# Diagrama Box-Whisker. Información sobre la dispersión, asimetría estadística                        
+# y posibles valores atípicoss                                                                         
 boxplot(credit$Income,main="Income")              
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
 qqplot.data(credit$Income)+ggtitle("Gráfica Q-Q para Income") 
