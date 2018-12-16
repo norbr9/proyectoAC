@@ -922,6 +922,14 @@ credit.Train.glm
 
 
 ### Modelo GBM (Stochastic Gradient Boosting)
+La mejor combiancion de hiper-parametros y el mejor resultado es el siguiente:
+```{r}
+credit.Train.gbm$bestTune
+max(credit.Train.gbm$results$Accuracy)
+```
+
+
+
 Grafico de la precision del modelo frente a los hiper-parametros
 ```{r}
 # Incrementamos el número de lineas que muestra print
