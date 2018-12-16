@@ -22,7 +22,7 @@ library(ellipse)
 library(doParallel)
 library(rpart)
 library(gbm)
-
+library(MLmetrics)
 ```
 
 Primero cargaremos las librerías necearias para la ejecución de las funciones que necesitaremos.
@@ -604,7 +604,7 @@ Ahora podemos ver el efecto del escalado sobre las variables de entrada y compro
 VarToPlot<-credit.Vars.Entrada.Escaladas
 d1<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F,xlim = c(0,8),xlab = "Valores Variables Entrada")
+  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F,xlim = c(-2,4),ylim = c(0,5),xlab = "Valores Variables Entrada")
 d2<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
   data=credit.Datos.Train.Transf.CS, main="Variables Normalizadas",plot.points=F, xlab = "Valores Variables Entrada", xlim = c(-2,4))
@@ -1206,11 +1206,132 @@ Ambos resultados son muy parecidos.
 
 ## 5.2. Decidir justificadamente el modelo final
 
+
 ## 5.3. Evaluar el rendimiento futuro del modelo final
 
+Vamos a evaluar el rendimiento para el modelo GBM, con los datos procesados y sin procesar
+
+Para los datos sin procesar:
+
+```{r}
+# Prediciendo los valores del conjunto Test (nunca vistos)
+preds<-predict(credit.Train.gbm.nt,
+newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas])
+# Reordenamos los niveles para que la clase positiva (pos) sea el primero
+preds.ord<-factor(preds,levels(preds)[c(2,1)])
+predsProbs<-predict(credit.Train.gbm.nt,
+newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas],
+type="prob")
 
 
 
+```
+
+
+```{r}
+postResample(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]])
+# Reordenamos los niveles para que pos(itivo) sea el primero
+obs.ord<-credit.Test.Preprocesado[[credit.Var.Salida.Usada]]
+obs.ord<-factor(obs.ord,levels(obs.ord)[c(2,1)])
+# Datos para twoClassSummary
+data2ClassSum<-data.frame(pred=preds.ord,obs=obs.ord,
+pos=predsProbs["+"])
+dataMnLogLoss<-data.frame(pred=preds.ord,obs=obs.ord,
+pos=predsProbs["+"],neg=predsProbs["-"])
+
+#twoClassSummary(data2ClassSum,lev=levels(obs.ord))
+prSummary(data2ClassSum,lev=levels(obs.ord))
+#mnLogLoss(dataMnLogLoss,lev=levels(obs.ord))
+# Calcula datos para lift y calibration curves
+lift_results <- data.frame(Class = obs.ord)
+lift_results$GBM <- predict(credit.Train.gbm.nt,
+credit.Test.Preprocesado[credit.Vars.Entrada.Usadas], type = "prob")[,"+"]
+trellis.par.set(caretTheme())
+# Calcula lift curves
+lift_obj <- lift(Class ~ GBM, data = lift_results)
+plot(lift_obj, values = 60, auto.key = list(columns = 3,
+lines = TRUE,
+points = FALSE))
+# Calcula calibration curves
+cal_obj <- calibration(Class ~ GBM, data = lift_results,
+cuts = 13)
+plot(cal_obj, type = "l", auto.key = list(columns = 3,
+lines = TRUE,
+points = FALSE))
+
+```
+
+
+```{r}
+# Usamos el parámetro positive="pos" porque sino usa como positive el primer
+# nivel que encuentra (que en este caso es "neg")
+caret::confusionMatrix(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]],
+positive="+")
+```
+
+Obtenemos un accuaracy bastante bajo de tan solo un 60%. Es decir solo un 60% de los datos en el conjunto test se han clasificado correctamente.
 
 
 
+Para los datos procesados:
+
+```{r}
+# Prediciendo los valores del conjunto Test (nunca vistos)
+preds<-predict(credit.Train.gbm.t,
+newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas])
+# Reordenamos los niveles para que la clase positiva (pos) sea el primero
+preds.ord<-factor(preds,levels(preds)[c(2,1)])
+predsProbs<-predict(credit.Train.gbm.nt,
+newdata=credit.Test.Preprocesado[credit.Vars.Entrada.Usadas],
+type="prob")
+
+
+
+```
+
+
+```{r}
+postResample(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]])
+# Reordenamos los niveles para que pos(itivo) sea el primero
+obs.ord<-credit.Test.Preprocesado[[credit.Var.Salida.Usada]]
+obs.ord<-factor(obs.ord,levels(obs.ord)[c(2,1)])
+# Datos para twoClassSummary
+data2ClassSum<-data.frame(pred=preds.ord,obs=obs.ord,
+pos=predsProbs["+"])
+dataMnLogLoss<-data.frame(pred=preds.ord,obs=obs.ord,
+pos=predsProbs["+"],neg=predsProbs["-"])
+
+#twoClassSummary(data2ClassSum,lev=levels(obs.ord))
+prSummary(data2ClassSum,lev=levels(obs.ord))
+#mnLogLoss(dataMnLogLoss,lev=levels(obs.ord))
+# Calcula datos para lift y calibration curves
+lift_results <- data.frame(Class = obs.ord)
+lift_results$GBM <- predict(credit.Train.gbm.nt,
+credit.Test.Preprocesado[credit.Vars.Entrada.Usadas], type = "prob")[,"+"]
+trellis.par.set(caretTheme())
+# Calcula lift curves
+lift_obj <- lift(Class ~ GBM, data = lift_results)
+plot(lift_obj, values = 60, auto.key = list(columns = 3,
+lines = TRUE,
+points = FALSE))
+# Calcula calibration curves
+cal_obj <- calibration(Class ~ GBM, data = lift_results,
+cuts = 13)
+plot(cal_obj, type = "l", auto.key = list(columns = 3,
+lines = TRUE,
+points = FALSE))
+
+```
+
+
+```{r}
+# Usamos el parámetro positive="pos" porque sino usa como positive el primer
+# nivel que encuentra (que en este caso es "neg")
+caret::confusionMatrix(preds,credit.Test.Preprocesado[[credit.Var.Salida.Usada]],
+positive="+")
+```
+
+
+Se ha obtenido un 74% de accuracy. Este es un resultado bastante mejor que con los datos sin procesar.
+
+En conclusion, a pesar de que en un pricipio el modelo con los datos sin procesar parecía que clasificaba mejor, nos hemos dado cuenta al hacer un test con datos nuevos que esto no se cumple. Al final el preprocesamiento de los datos ha hecho que la clasificacion mejore notablemente para datos nuevos.
