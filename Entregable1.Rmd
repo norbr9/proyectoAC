@@ -801,64 +801,52 @@ registerDoParallel(cl)
 #Ejecutar Modelos
 #Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV1, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV1, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
 #Modelo glm
 set.seed(1234)
-credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV1)
+credit.Train.glm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV1)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
+
+credit.Train.rf.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rpart<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV1, tuneLength = 10)
+credit.Train.rpart.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV1, tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
 stopImplicitCluster()
 stopCluster(cl)
 registerDoSEQ()
-
-credit.Train.gbm
-credit.Train.glm
-credit.Train.rf
-credit.Train.rpart
-
 ```
 
 
-### Modelo GBM (Stochastic Gradient Boosting)
 
-Gráfico de la precision del modelo frente a los hiper-parámetros
+Y aquí los mejores resultados de cada modelo:
 
 ```{r}
-# Incrementamos el número de lineas que muestra print
-options(max.print = 10000)
-# Usamos escala logaritmica en el eje x
-plot(credit.Train.gbm,scales=list(x=list(log=T)))
-options(max.print = 1000)
+credit.Train.gbm.nt$bestTune
+max(credit.Train.gbm.nt$results$Accuracy)
+
+
+#glm no tiene hiper-parametros
+max(credit.Train.glm.nt$results$Accuracy)
+
+
+credit.Train.rf.nt$bestTune
+max(credit.Train.rf2.nt$results$Accuracy)
+
+credit.Train.rpart.nt$bestTune
+max(credit.Train.rpart.nt$results$Accuracy)
+
 ```
 
-
-Grafico del valor estadistico Kappa frente a los hiper-parámetros
-```{r}
-plot(credit.Train.gbm, metric = "Kappa")
-```
-
-Grafico de nivel, precision frente a hiper-parámetros.
-
-```{r}
-plot(credit.Train.gbm, plotType = "level")
-```
+Se puede observar que GBM ha conseguido el mejor resultado
 
 
-Grafico de densidad para Accuracy y Kappa del modelo final
-Dibuja el grafico de la distribucion de remuestreo
-```{r}
-resampleHist(credit.Train.gbm)
-```
 
 
 ### 4.3.2 Modelos con datos transformados
@@ -890,19 +878,20 @@ registerDoParallel(cl)
 #Ejecutar Modelos
 #Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV2, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV2, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
 #Modelo glm
 set.seed(1234)
-credit.Train.glm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV2)
+credit.Train.glm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV2)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
+credit.Train.rf.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
+
 
 #Modelo RPART con tuneLength
 set.seed(1234)
-credit.Train.rpart<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV2, tuneLength = 10)
+credit.Train.rpart.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV2, tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
@@ -910,18 +899,252 @@ stopImplicitCluster()
 stopCluster(cl)
 registerDoSEQ()
 
-credit.Train.gbm
-credit.Train.glm
-credit.Train.rf
-credit.Train.rpart
+```
+
+Y aquí los mejores resultados de cada modelo:
+```{r}
+credit.Train.gbm.t$bestTune
+max(credit.Train.gbm.t$results$Accuracy)
+
+
+#glm no tiene hiper-parametros
+max(credit.Train.glm.t$results$Accuracy)
+
+
+credit.Train.rf.t$bestTune
+max(credit.Train.rf.t$results$Accuracy)
+
+credit.Train.rpart.t$bestTune
+max(credit.Train.rpart.t$results$Accuracy)
 
 ```
+
+Se puede observar que GBM ha conseguido el mejor resultado
 
 
 
 # 5. Comparar Modelos
 
 ## 5.1. Comparar el rendimiento de los diferentes modelos
+
+### Modelo GBM (Stochastic Gradient Boosting)
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
+
+Para los datos transformados:
+```{r}
+credit.Train.gbm.t$bestTune
+max(credit.Train.gbm.t$results$Accuracy)
+```
+
+Y sin transformar:
+
+```{r}
+credit.Train.gbm.nt$bestTune
+max(credit.Train.gbm.nt$results$Accuracy)
+```
+
+
+Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
+
+
+
+
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+```{r}
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.gbm.t,scales=list(x=list(log=T)))
+options(max.print = 1000)
+```
+
+
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+```{r}
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.gbm.nt,scales=list(x=list(log=T)))
+options(max.print = 1000)
+```
+
+
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+```{r}
+plot(credit.Train.gbm.t, metric = "Kappa")
+```
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+```{r}
+plot(credit.Train.gbm.nt, metric = "Kappa")
+```
+
+
+
+Grafico de nivel, precision frente a hiper-parametros (Datos Transformados)
+
+```{r}
+plot(credit.Train.gbm.t, plotType = "level")
+```
+
+Grafico de nivel, precision frente a hiper-parametros (Datos Sin Transformar)
+
+```{r}
+plot(credit.Train.gbm.nt, plotType = "level")
+```
+
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.gbm.t)
+```
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.gbm.nt)
+```
+
+
+
+Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prácticamente el mismo.
+
+
+
+### Modelo GLM
+Ya que GLM no tiene hiper-parametros, no existe una mejor configuracion.Aun así, el mejor resultado es la siguiente.
+
+Para los datos transformados:
+```{r}
+max(credit.Train.glm.t$results$Accuracy)
+```
+
+Y sin transformar:
+
+```{r}
+max(credit.Train.glm.nt$results$Accuracy)
+```
+
+
+Observamos que para los datos sin transformar se obtine un resultado ligeramente superior.
+
+
+Como hemos dicho antes, al no existir hiper-parametros no se puede dibujar ninguna grafica que contemple cambios enrte los resultados y los parametros. Pero si es posible dibujar el grafico de la distribuciond e remuestreo:
+
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.glm.t)
+```
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.glm.nt)
+```
+Ambos son muy similares.
+
+
+### Modelo RPART
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
+
+Para los datos transformados:
+```{r}
+credit.Train.rpart.t$bestTune
+max(credit.Train.gbm.t$results$Accuracy)
+```
+
+Y sin transformar:
+
+```{r}
+credit.Train.rpart.nt$bestTune
+max(credit.Train.gbm.nt$results$Accuracy)
+```
+
+
+Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
+
+
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+```{r}
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.rpart.t,scales=list(x=list(log=T)))
+options(max.print = 1000)
+```
+
+
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+```{r}
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.rpart.nt,scales=list(x=list(log=T)))
+options(max.print = 1000)
+```
+
+
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+```{r}
+plot(credit.Train.rpart.t, metric = "Kappa")
+```
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+```{r}
+plot(credit.Train.rpart.nt, metric = "Kappa")
+```
+
+
+
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.rpart.t)
+```
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.rpart.nt)
+```
+
+
+
+Hay ligeras diferencias entre ambos conjuntos de datos pero el resultado es prácticamente el mismo.
+
+
+### Modelo RF
+
+La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
+
+Para los datos transformados:
+```{r}
+credit.Train.rf.t$bestTune
+max(credit.Train.rf.t$results$Accuracy)
+```
+
+Y sin transformar:
+
+```{r}
+credit.Train.rf.nt$bestTune
+max(credit.Train.rf.nt$results$Accuracy)
+```
+
+En este caso se ha obtenido un mejor resultado con los datos transformados
+
+
+
+
 
 ## 5.2. Decidir justificadamente el modelo final
 
