@@ -41,7 +41,7 @@ colnames(credit) <- c("Male", "Age", "Debt", "Married", "BankCustomer", "Educati
                       "YearsEmployed", "PriorDefaul", "Employed", "CreditScore", "DriversLicense", "Citizen",
                       "ZipCode", "Income","Approved")
 
-# Informacion de los atributos. Columnas
+# Información de los atributos. Columnas
 # Male:	b, a. 
 # Age:	continuous. 
 # Debt:	continuous. 
@@ -94,7 +94,7 @@ qqplot.data <- function (vec)
 ```
 
 
-Las variables que vamos a analizar serán: 
+Las variables que vamos a analizar serán: Male, Age, 
 
 ```{r}
 
@@ -110,21 +110,24 @@ barplot(table(credit$Male), ylim = c(0,500))
 
 ```
 
-  Esta se trata de una variable no numérica, lo 
+  Male se trata de una variable no numérica, para representar este tipo de variables utilizaremos la función barplot() que nos devolverá un diagrama de barra. En el diagrama devuelto podemos observar que el tipo b dobla el tipo a, como no sabemos qué representa a y b no podemos asumir nada más concreto.
 
 
 ```{r}
 ####### Análisis variable Age #######
 # Variable Continua  
 # Resumen    
-summary(credit[2], maxsum = Inf)                                                             
+summary(credit[2], maxsum = Inf)
+```
+
+```{r, results='hide'}
 # Numero de ocurrencias (porcentaje)     
 porcent <- prop.table(table(credit$Age)) * 100   
 cbind(total=table(credit$Age), porcentaje=porcent)                                             
-# Histograma con frecuencias de aparicion
+```
 
-
-# Estimacion de la fucnión de desidad de probabilidad          
+```{r}
+# Estimación de la fucnión de desidad de probabilidad          
 dens<-density(credit$Age,na.rm=T)                             
 hist(credit$Age,xlab="",main="Age",ylim=c(0,max(dens$y)*1.1),probability =T) 
 lines(dens)                                                                 
@@ -132,12 +135,12 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$Age))                                         
-# Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica y posibles valores atípicos
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica y posibles valores atípicos
 boxplot(credit$Age,main="Age")                                       
-# Representación de los percentiles con respecto a los de una normal centrada en cero 
 qqplot.data(credit$Age)+ggtitle("Gráfica Q-Q para Age")
 
 ```
+
 
 
 
@@ -157,13 +160,13 @@ cbind(total=table(credit$Debt), porcentaje=porcent)
 
 ```{r}
 # Histograma con frecuencias de aparición             
-# Estimacion de la fucnion de desidad de probabilidad   
+# Estimación de la fucnion de desidad de probabilidad   
 dens<-density(credit$Debt,na.rm=T)                    
 hist(credit$Debt,xlab="",main="Debt",ylim=c(0,max(dens$y)*1.1),probability =T)    
 lines(dens)                     
 rug(jitter(credit$Debt))                            
 
-# Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica y posibles valores atipicos  
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica y posibles valores atipicos  
 boxplot(credit$Debt,main="Debt")        
 # Representación de los percentiles con respecto a los de una normal centrada en cero  
 qqplot.data(credit$Debt)+ggtitle("Gráfica Q-Q para Debt")                                                
@@ -250,7 +253,7 @@ cbind(total=table(credit$YearsEmployed), porcentaje=porcent)
 ```
 ```{r}
 # Histograma con frecuencias de aparicion                                                             
-# Estimacion de la fucnion de desidad de probabilidad                                                 
+# Estimación de la fucnion de desidad de probabilidad                                                 
 dens<-density(credit$YearsEmployed,na.rm=T)                                                                      
 hist(credit$YearsEmployed,xlab="",main="YearsEmployed",ylim=c(0,max(dens$y)*1.1),probability =T)                            
 lines(dens)                                                                                           
@@ -258,7 +261,7 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$YearsEmployed))         
-# Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$YearsEmployed,main="YearsEmployed")    
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
@@ -310,7 +313,7 @@ summary(credit[11], maxsum = Inf)
 porcent <- prop.table(table(credit$CreditScore)) * 100                                                        
 cbind(total=table(credit$CreditScore), porcentaje=porcent)                                                              
 # Histograma con frecuencias de aparicion                                                             
-# Estimacion de la fucnion de desidad de probabilidad                                                 
+# Estimación de la fucnion de desidad de probabilidad                                                 
 dens<-density(credit$CreditScore,na.rm=T)                                                                     
 hist(credit$CreditScore,xlab="",main="CreditScore",ylim=c(0,max(dens$y)*1.1),probability =T)                          #
 lines(dens)                                                                                           
@@ -318,7 +321,7 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$CreditScore))           
-# Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$CreditScore,main="CreditScore")      
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
@@ -371,7 +374,7 @@ cbind(total=table(credit$ZipCode), porcentaje=porcent)
 ```
 ```{r}
 # Histograma con frecuencias de aparicion                                                             
-# Estimacion de la fucnion de desidad de probabilidad                                                 
+# Estimación de la fucnion de desidad de probabilidad                                                 
 dens<-density(credit$ZipCode,na.rm=T)                                                                     
 hist(credit$ZipCode,xlab="",main="ZipCode",ylim=c(0,max(dens$y)*1.1),probability =T)                          
 lines(dens)                                                                                           
@@ -379,7 +382,7 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$ZipCode))            
-# Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$ZipCode,main="ZipCode")             
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
@@ -403,7 +406,7 @@ cbind(total=table(credit$Income), porcentaje=porcent)
 ```
 ```{r}
 # Histograma con frecuencias de aparicion                                                             
-# Estimacion de la fucnion de desidad de probabilidad       
+# Estimación de la fucnion de desidad de probabilidad       
 dens<-density(credit$Income,na.rm=T)                         
 hist(credit$Income,xlab="",main="Income",ylim=c(0,max(dens$y)*1.1),probability =T) 
 lines(dens)                                                                                           
@@ -411,7 +414,7 @@ lines(dens)
 # jitter() para añadir un poco de ruido aleatorio a los valores verdaderos,                           
 # por si hubiese valores repetidos                                                                    
 rug(jitter(credit$Income))     
-# Diagrama Box-Whisker. Informacion sobre la dispersion, asimetria estadistica                        
+# Diagrama Box-Whisker. Información sobre la dispersion, asimetria estadistica                        
 # y posibles valores atipicos                                                                         
 boxplot(credit$Income,main="Income")              
 # Representación de los percentiles con respecto a los de una normal centrada en cero                 
