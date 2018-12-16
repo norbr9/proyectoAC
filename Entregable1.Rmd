@@ -1053,6 +1053,14 @@ Se ha obtenido un 74% de accuracy. Es decir un 74% de los datos de prueba se han
 # 6. Bibliografía
 
 https://www.stat.umn.edu/arc/yjpower.pdf
+https://onlinecourses.science.psu.edu/stat504/node/216/
+https://stats.stackexchange.com/questions/27651/how-would-you-explain-generalized-linear-models-to-people-with-no-statistical-ba
+https://www.jstatsoft.org/article/view/v028i05/v28i05.pdf
+https://medium.com/mlreview/gradient-boosting-from-scratch-1e317ae4587d
+
+
+
+
 
 
 
