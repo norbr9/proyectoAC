@@ -1137,9 +1137,59 @@ credit.Train.rf.nt$bestTune
 max(credit.Train.rf.nt$results$Accuracy)
 ```
 
-En este caso se ha obtenido un mejor resultado con los datos transformados
+En este caso se ha obtenido un mejor resultado con los datos transformados.
 
 
+
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+```{r}
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.rf.t,scales=list(x=list(log=T)))
+options(max.print = 1000)
+```
+
+
+Grafico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+```{r}
+# Incrementamos el número de lineas que muestra print
+options(max.print = 10000)
+# Usamos escala logaritmica en el eje x
+plot(credit.Train.rf.nt,scales=list(x=list(log=T)))
+options(max.print = 1000)
+```
+
+
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+```{r}
+plot(credit.Train.rf.t, metric = "Kappa")
+```
+
+
+Grafico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+```{r}
+plot(credit.Train.rf.nt, metric = "Kappa")
+```
+
+
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Transformados)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.rf.t)
+```
+
+Grafico de densidad para Accuracy y Kappa del modelo final (Datos Sin Transformar)
+Dibuja el grafico de la distribucion de remuestreo
+```{r}
+resampleHist(credit.Train.rf.nt)
+```
+
+
+Ambos resultados son muy parecidos.
 
 
 
