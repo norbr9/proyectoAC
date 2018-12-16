@@ -724,7 +724,7 @@ Calcularemos las semillas para usarlas en la función trainControl que pasaremos
 
 ### 4.2.1. Modelo GLM
 
-El modelo glm no tiene hiper-parametros por lo que no se puede modficar nada
+El modelo glm no tiene hiper-parametros por lo que no se puede modficar nada.
 
 ```{r}
 modelLookup("glm")
@@ -732,7 +732,7 @@ modelLookup("glm")
 
 ### 4.2.2. Modelo RPART
 
-El modelo rpart
+El modelo rpart tiene como único parámetro el cp.
 
 ```{r}
 modelLookup("rpart")
@@ -740,7 +740,7 @@ modelLookup("rpart")
 
 ### 4.2.3. Modelo RF
 
-El modelo rf
+El modelo rf tiene como único parámetro el mtry.
 
 ```{r}
 modelLookup("rf")
@@ -777,8 +777,6 @@ credit.Train.gbm.grid <- expand.grid(
 En este entrenamiento usaremos el conjunto de datos de credit.Datos.Train, que solo tiene tratando los outliners y nulos.
 
 ```{r}
-#library(doParallel)
-
 set.seed(1234) ## Para la repetición de la ejecución de los modelos
 # seedsLength es = (numero_repeticiones*numero_remuestreos)+1, seguiremos lo visto en clase y usaremos los valores: (3*10)+1
 seedsLength=31
@@ -794,11 +792,7 @@ for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
 
 # TrainControl con seeds
-credit.Train.Control.gbm <- trainControl(method = "repeatedcv", number = 10, repeats = 3, verboseIter=T, returnResamp = "all") # Guardamos todo para hacer diagramas
-
-credit.Train.Control.glm <- trainControl(method = "repeatedcv",number = 10,repeats = 3  ,verboseIter=F,returnResamp = "all" ,seeds = seeds )
-
-credit.Train.Control.todos <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds )
+credit.Train.Control.CV1 <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
 
 
 # Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
@@ -808,19 +802,19 @@ registerDoParallel(cl)
 #Ejecutar Modelos
 #Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.todos, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV1, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
 #Modelo glm
 set.seed(1234)
-credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.todos)
+credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV1)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf2<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.todos, tuneLength = 4)
+credit.Train.rf2<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rpart<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.todos, tuneLength = 10)
+credit.Train.rpart<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV1, tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
@@ -908,7 +902,7 @@ for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
 seeds[[seedsLength+1]]<-sample.int(1000, 1)
 
 # TrainControl con seeds
-credit.Train.Control.todos <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
+credit.Train.Control.CV2 <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
 
 
 # Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
@@ -918,19 +912,19 @@ registerDoParallel(cl)
 #Ejecutar Modelos
 #Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.todos, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV2, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
 #Modelo glm
 set.seed(1234)
-credit.Train.glm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.todos)
+credit.Train.glm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV2)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf2<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.todos, tuneLength = 4)
+credit.Train.rf2<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
 
 #Modelo RPART con tuneLength
 set.seed(1234)
-credit.Train.rpart<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.todos, tuneLength = 10)
+credit.Train.rpart<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV2, tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
