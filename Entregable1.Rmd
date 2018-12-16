@@ -1,16 +1,53 @@
 ---
 title: "Entregable1"
-author: "Norberto García Marín y María Soledad Pérez López"
+author: "author"
 date: "November 29, 2018"
-output: 
-  pdf_document: 
-    latex_engine: xelatex
+output:
+  word_document: default
+  pdf_document: default
 ---
 
 
 
 # 1. Índice
-
+2. Carga de la base de datos	4
+3. Preprocesar Datos	4
+3.1. Analizar las variables	4
+3.1.1. Análisis monovariable	5
+3.1.2. Análisis multivariable	12
+3.2. Tratar valores nulos, extremos o atípicos	14
+3.2.1. Tratamiento de valores nulos	14
+3.2.1.1. Sustitución mediante valores representativos	16
+3.2.2. Tratamiento de valores extremos/atípicos	16
+3.2.3. Dividir datos en Train/Test	17
+3.3. Eliminar variables superfluas y añadir variables nuevas	17
+3.3.1. Eliminar variables con poca varianza	17
+3.3.2. Eliminar variables correladas	17
+3.3.3. Crear Dummy Variables	18
+3.4. Transformar los datos	18
+3.4.1. Escalado	18
+3.4.2. Transformaciones de relaciones entre variables	19
+3.4.3. Transformaciones de distribuciones asimétricas	19
+3.4.4. Crear nuevas variables	20
+4. Entrenar varios Modelos/Técnicas	21
+4.1. Escoger varios modelos/técnicas a comparar	21
+4.1.1. Modelo GLM (Generalized Linear Model)	21
+4.1.2. Modelo RPART	22
+4.1.3. Modelo RF	22
+4.1.4. Modelo GBM (Stochastic Gradient Boosting)	22
+4.2. Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)	22
+4.2.1. Modelo GLM	22
+4.2.2. Modelo RPART	23
+4.2.3. Modelo RF	23
+4.2.4. Modelo GBM (Stochastic Gradient Boosting)	23
+4.3. Ejecución de los modelos con dos conjuntos de datos.	23
+4.3.1 Modelos con datos sin transformar	23
+4.3.2 Modelos con datos transformados	25
+5. Comparar Modelos	26
+5.1. Comparar el rendimiento de los diferentes modelos	26
+5.2. Decidir justificadamente el modelo final	28
+5.3. Evaluar el rendimiento futuro del modelo final	29
+6. Bibliografía	31
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -606,6 +643,8 @@ credit.Train.gbm.grid <- expand.grid(
 ### 4.3.1 Modelos con datos sin transformar
 
 En este entrenamiento usaremos el conjunto de datos de credit.Datos.Train, que solo tiene tratado los outliners y nulos.
+
+Para ejecutar la función trainControl usaremos K-fold Crossvalidation, ya que los otros métodos puede disminuir la varianza.
 
 ```{r}
 set.seed(1234) ## Para la repetición de la ejecución de los modelos
