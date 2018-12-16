@@ -461,7 +461,7 @@ featurePlot(x=credit[,3],y=credit[,16],plot="density")
 
 ### 3.2.1. Tratamiento de valores nulos
 
-Para tomar medida de cuán serio es el problema de los valores nulos, debemos contar los casos que tienen valores nulos
+Para tomar medida de cuán serio es el problema de los valores nulos, debemos contar los casos que tienen valores nulos.
 
 ```{r}
 # Tratamiento de valores nulos
@@ -479,16 +479,16 @@ nrow(credit.Datos[!complete.cases(credit.Datos),])/nrow(credit.Datos)*100
 
 ```
 
-Como vemos tenemos 31 filas con valores filas con valores nulos, lo  que supone un 4,5% de casos.
+Como vemos, tenemos 31 filas con filas con valores nulos, lo que supone un 4,5% de los casos.
 
-No es recomendable deshacernos de los nulos sin más, ademas no hay ningun ejemplar que tenga muchas variables con valores nulos, por lo tanto la solucion seriá sustituirlas mediante valores representativos.
+No es recomendable deshacernos de los nulos sin más, además no hay ningún ejemplar que tenga muchas variables con valores nulos, por lo tanto la solución seriá sustituirlas mediante valores representativos.
 
 
 #### 3.2.1.1. Sustitución mediante valores representativos
 
-Como la muestra tiene una distribucion desplazada skewed para todas las variables continuas, la mediana es la mejor opcion como valor central para sustituir.
+Como la muestra tiene una distribución desplazada skewed para todas las variables continuas, la mediana es la mejor opción como valor central para sustituir.
 
-Para las variables no continuas sustituiremos los valores nulos por el valor que mas se repita
+Para las variables no continuas sustituiremos los valores nulos por el valor que más se repita.
 
 
 ```{r}
@@ -510,7 +510,7 @@ for(i in 1:14){
 
 ```
 
-Y comprobamos si se han sustituido correctamente
+Y comprobamos si se han sustituido correctamente.
 
 ```{r}
 print("Porcentaje de filas con valores nulos")
@@ -520,7 +520,7 @@ nrow(credit[!complete.cases(credit.fix),])/nrow(credit.fix)*100
 
 ### 3.2.2.  Tratamiento de valores extremos/atípicos
 
-Sustitucion de los valores extremos y atipicos por la mediana de la variable en cuestion
+Sustitución de los valores extremos y atípicos por la mediana de la variable en cuestión.
 
 ```{r}
 for(i in 1:14){
@@ -537,7 +537,7 @@ for(i in 1:14){
 
 ## 3.2.3. Dividir datos en Train/Test
 
-Ahora que se han pre-procesado los datos parcialmente (Tratando los outliners y nulos) se debe separar el dataset en dos conjuntos
+Ahora que se han pre-procesado los datos parcialmente (Tratando los outliners y nulos) se debe separar el dataset en dos conjuntos.
 
 ```{r}
 credit.trainIdx<-readRDS("credit.trainIdx.rds")
@@ -557,14 +557,14 @@ nrow(credit.Datos.Test)
 ### 3.3.1. Eliminar variables con poca varianza
 
 Vamos a intentar eliminar variables con poca varianza.
-Cuando una variable tiene poca varianza indica que carece de mucha informacion para crear distinciones entre los datos. Esto puede generar problemas a muchos algoritmos de machine learning
+Cuando una variable tiene poca varianza indica que carece de mucha información para crear distinciones entre los datos. Esto puede generar problemas a muchos algoritmos de machine learning.
 
-Vemos si existe alguna variable con esta caracteristica
+Vemos si existe alguna variable con esta caracteristica:
 ```{r}
 nearZeroVar(credit.Datos.Train)
 ```
 
-Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como esta.
+Vemos que no existe ninguna variable, por lo tanto dejamos el dataset como está.
 
 ### 3.3.2. Eliminar variables correladas
 
@@ -582,7 +582,7 @@ colsToRemove<-labels(datos.cor)[[1]][findCorrelation(datos.cor,cutoff=0.85)]
 credit.nocorr<-credit.Datos.Train[setdiff(names(credit.Datos.Train),colsToRemove)]
 ```
 
-Comprobamos si el dataset de entrada y el de nocorr son diferentes
+Comprobamos si el dataset de entrada y el de nocorr son iguales:
 
 ```{r}
 identical(credit.nocorr,credit.Datos.Train)
@@ -591,10 +591,10 @@ No hay ninguna variable correlada por lo que no se puede eliminar nada.
 
 
 ### 3.3.3. Crear Dummy Variables
-Las Variables Dummy es una forma de transformar factores en un conjunto de variables num ́ericas dondecada nivel es ortogonal al resto de variables dummy para ese factor.
-as variables dummy son necesarias en algunos modelos matem ́aticos que trabajan con la matrizde atributos y valores de entrada.
+Las Variables Dummy es una forma de transformar factores en un conjunto de variables numéricas donde cada nivel es ortogonal al resto de variables dummy para ese factor.
+Las variables dummy son necesarias en algunos modelos matemáticos que trabajan con la matriz de atributos y valores de entrada.
 
-Como caret transforma por defecto las variables de entrada que son factores creando dummy variables no haremos esta transformación de forma manual.
+Como caret transforma por defecto las variables de entrada que son factores creando dummy variables, no haremos esta transformación de forma manual.
 
 
 
@@ -722,7 +722,7 @@ print(p1,position=c(0,0,0.5,1),more=T)
 print(p2,position=c(0.5,0,1,1))
 ```
 
-De ahora en adelante para simpleficar el nombre del dataset a utilizar guardaremos el train y test en credit.Train.Preprocesado y credit.Test.Preprocesado
+De ahora en adelante para simplificar el nombre del dataset a utilizar guardaremos el train y test en credit.Train.Preprocesado y credit.Test.Preprocesado:
 
 ```{r}
 credit.Train.Preprocesado<-credit.xtra.Vars
@@ -739,11 +739,11 @@ Ahora que tenemos el preprocesado de datos hecho, pasaremos al entrenamiento de 
 
 
 ### 4.1.1. Modelo GLM (Generalized Linear Model)
-El Modelo GlM es una generalizacion flexible de una regresion lineal. Esta, permite variables de respuesta que tienen modelos de distribución de errores distintos de una distribución normal.
+El Modelo GlM es una generalizacion flexible de una regresión lineal. Esta, permite variables de respuesta que tienen modelos de distribución de errores distintos de una distribución normal.
 
 Existen 3 componentes en un modelo GLM:
-* Random Component: Distribucion de probabildiad de las variables de respuesta.
-* Systematic Component: La combinacion lineal de variables en el modelo que sirven para crear un predictor lineal.
+* Random Component: Distribución de probabildiad de las variables de respuesta.
+* Systematic Component: La combinación lineal de variables en el modelo que sirven para crear un predictor lineal.
 * Link Function, η or g(μ): Especifica la union entre random component y Systematic Compononet.
 
 
@@ -759,17 +759,14 @@ Para la búsqueda de hiper-parámetros vamos a usar tuneLeght de la función tra
 
 ### 4.1.4. Modelo GBM (Stochastic Gradient Boosting)
 
-El modelo GBM o Potenciacion del gradiente, es una técnica de machine learning utilizada para problemas de analisis de regresion y clasificación estadistica. Esta técnica produce un modelo predictivo en forma de conjunto de modelos de predicción débiles, normalmente árboles de decisión. El modelo se construye de forma escalonada como lo hacen otros métodos de boosting, es decir, los predictores no se forman de manerera independiente, si no, de manera secuencial.
+El modelo GBM o Potenciacion del gradiente, es una técnica de machine learning utilizada para problemas de analisis de regresión y clasificación estadística. Esta técnica produce un modelo predictivo en forma de conjunto de modelos de predicción débiles, normalmente árboles de decisión. El modelo se construye de forma escalonada como lo hacen otros métodos de boosting, es decir, los predictores no se forman de manerera independiente, si no, de manera secuencial.
 
 
 ![Imagen de Baggin y Boosting](boosting.png)
-Bagging (independent models) & Boosting (sequential models). Reference: https://quantdare.com/what-is-the-difference-between-bagging-and-boosting/
+>Baggin & Boosting 
 
 La principal diferencia entre Baggin y Boosting es que en Bagging se construye los predictores de manera independiente y luego se combinan y en el Boosting se construyen de manera dependediente y secuencialmente.
 
-
-
-Calcularemos las semillas para usarlas en la función trainControl que pasaremos al entrenamientod de los modelos
 
 
 ## 4.2. Encontrar los mejores hiper-parámetros (usar TunerGrid en, al menos, 1 modelo)
@@ -827,7 +824,7 @@ credit.Train.gbm.grid <- expand.grid(
 
 ### 4.3.1 Modelos con datos sin transformar
 
-En este entrenamiento usaremos el conjunto de datos de credit.Datos.Train, que solo tiene tratando los outliners y nulos.
+En este entrenamiento usaremos el conjunto de datos de credit.Datos.Train, que solo tiene tratado los outliners y nulos.
 
 ```{r}
 set.seed(1234) ## Para la repetición de la ejecución de los modelos
@@ -1001,15 +998,15 @@ dotplot(credit.Train.Resamp.Acc, scales =list(x = list(relation = "free")), betw
 
 ## 5.2. Decidir justificadamente el modelo final
 
-  Con los resultados del rendimiento en el apartado anterior, podemos ver que los entrenamientos que descatan son los que utilizan gbm (potenciación del gradiente), tanto con los datos básicos como con los preprocesados.
+Con los resultados del rendimiento en el apartado anterior, podemos ver que los entrenamientos que descatan son los que utilizan gbm (potenciación del gradiente), tanto con los datos básicos como con los preprocesados.
   
-  En el diagrama generado por la función dotplot(), podemos ver claramente como los modelos gbm están entre el 72%~73% y el 76%~77% de aciertos, siendo los que queden por delante de los demás.
+En el diagrama generado por la función dotplot() podemos ver claramente como los modelos gbm están entre el 72%~73% y el 76%~77% de aciertos, siendo los que queden por delante de los demás.
   
-  Si pasamos al diagrama devuelto por bwplt() obvervamos que algunas veces pueden llegar a alcanzar casi el 85% de aciertos. No podemos pasar por alto que el modelo rf aplicado sobre los datos transformados sobrepasa ese 85%, pero nos decantamos por los resultados mostrados por el Cleveland dot plot, ya que da el intervalo de confianza al 95% del rendimiento sobre los conjuntos de validación.
+Si pasamos al diagrama devuelto por bwplt() obvervamos que algunas veces pueden llegar a alcanzar casi el 85% de aciertos. No podemos pasar por alto que el modelo rf aplicado sobre los datos transformados sobrepasa ese 85%, pero nos decantamos por los resultados mostrados por el Cleveland dot plot, ya que da el intervalo de confianza al 95% del rendimiento sobre los conjuntos de validación.
   
-  En la gráfica de densityplot() vemos que glm y gbm sobre los datos no transformados tienen mayor frecuencia entre 70% y el 80% de aciertos, aunque como lo explicado anteriormente gbm queda por delante.
+En la gráfica de densityplot() vemos que glm y gbm sobre los datos no transformados tienen mayor frecuencia entre 70% y el 80% de aciertos, aunque como lo explicado anteriormente gbm queda por delante.
 
-  Con lo descrito y basándonos en las comparaciones decidimos que nos quedamos como modelo final el gbm aplicado sobre los datos transformados, ya que en ocasiones puede dar mejores resultados que el modelo gbm sobre los datos no tratados.
+Con lo descrito y basándonos en las comparaciones decidimos que nos quedamos como modelo final el gbm aplicado sobre los datos transformados, ya que en ocasiones puede dar mejores resultados que el modelo gbm sobre los datos no tratados.
 
 
 
@@ -1099,3 +1096,4 @@ Análisis de datos y machine learning con R (caret) - Sesiones de prácticas de 
 
 <https://nycdatascience.com/blog/student-works/credit-card-approval-analysis/>
 
+<https://quantdare.com/what-is-the-difference-between-bagging-and-boosting/>
