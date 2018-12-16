@@ -623,25 +623,25 @@ No es necesario, ya que cuando hicimos el estudio para eliminar variables correl
 
 ### 3.4.3. Transformaciones de distribuciones asimétricas
 
-Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson porque necesitamos que se puedan tratar valores negativos.
+Observando las gráficas anteriores podemos darnos cuenta de la asimetría que existe en algunas variables. Para tratar que los datos sean lo más "gausianos"(o normales) posibles vamos a aplicar tranformaciones en la función preProcess(). Usaremos el método YeoJohnson, ya que la asimetría en algunos casos es media y en otros es bastante grande.
 
 
 ```{r, warning=FALSE}
 
-credit.preProc.CS.Mod.BC<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "BoxCox"))
+credit.preProc.CS.Mod.YJ<-preProcess(credit.Datos.Train[credit.Vars.Entrada.Escaladas], method=c("center","scale", "YeoJohnson"))
 
 # Obtenemos la transformación
-credit.Datos.Train.Transf.CS.BC<-predict(credit.preProc.CS.Mod.BC,credit.Datos.Train)
-credit.Datos.Test.Transf.CS.BC<-predict(credit.preProc.CS.Mod.BC,credit.Datos.Test)
+credit.Datos.Train.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Train)
+credit.Datos.Test.Transf.CS.YJ<-predict(credit.preProc.CS.Mod.YJ,credit.Datos.Test)
 
 
 d1<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F)
+  data=credit.Datos.Train,main="Variables sin Normalizar",plot.points=F, xlab = "Valores Variables Entrada", xlim = c(0,8))
 
 d3<-densityplot(
   formula(paste("~",paste(VarToPlot,sep="",collapse =" + "),collapse="")),
-  data=credit.Datos.Train.Transf.CS.BC, main="Variables Aplicado BC",plot.points=F)
+  data=credit.Datos.Train.Transf.CS.YJ, main="Variables Aplicado YJ",plot.points=F, xlab = "Valores Variables Entrada")
 
 trellis.par.set(theme = standard.theme("pdf",color=FALSE))
 print(d1,position=c(0,0,0.5,1),more=T)
@@ -660,10 +660,10 @@ Como no queremos perder información que puede ser relevante no vamos a aplicar 
 
 ```{r, warning=FALSE}
 # Ejemplo de crear nuevas variables con Class Distribution
-credit.preProc.ClssDtrb.Mod<-classDist(credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas],credit.Datos.Train.Transf.CS.BC[,15])
+credit.preProc.ClssDtrb.Mod<-classDist(credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas],credit.Datos.Train.Transf.CS.YJ[,15])
 # A~nadimos las nuevas variables
-credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.BC,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.BC[credit.Vars.Entrada.Escaladas]))
-credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.BC,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Test.Transf.CS.BC[credit.Vars.Entrada.Escaladas]))
+credit.xtra.Vars<-cbind(credit.Datos.Train.Transf.CS.YJ,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Train.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
+credit.xtra.VarsTest<-cbind(credit.Datos.Test.Transf.CS.YJ,predict(credit.preProc.ClssDtrb.Mod, credit.Datos.Test.Transf.CS.YJ[credit.Vars.Entrada.Escaladas]))
 
 # Dibujamos las nuevas variables y las antiguas
 p1<-featurePlot(x=predict(credit.preProc.ClssDtrb.Mod, credit.xtra.Vars[credit.Vars.Entrada.Escaladas]), credit.xtra.Vars[,15],plot="ellipse")
@@ -810,9 +810,9 @@ credit.Train.glm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credi
 #Modelo RF con tuneLength
 set.seed(1234)
 
-credit.Train.rf.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
+credit.Train.rf.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', verbose=F, trControl=credit.Train.Control.CV1, tuneLength = 4)
 
-#Modelo RF con tuneLength
+#Modelo RPART con tuneLength
 set.seed(1234)
 credit.Train.rpart.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV1, tuneLength = 10)
 
@@ -829,18 +829,24 @@ Y aquí los mejores resultados de cada modelo:
 
 ```{r}
 credit.Train.gbm.nt$bestTune
+print('BGM')
 max(credit.Train.gbm.nt$results$Accuracy)
 
 
 #glm no tiene hiper-parametros
+print('BLM')
 max(credit.Train.glm.nt$results$Accuracy)
 
 
 credit.Train.rf.nt$bestTune
-max(credit.Train.rf2.nt$results$Accuracy)
+print('RF')
+max(credit.Train.rf.nt$results$Accuracy)
+
 
 credit.Train.rpart.nt$bestTune
+print('RPART')
 max(credit.Train.rpart.nt$results$Accuracy)
+
 
 ```
 
@@ -886,7 +892,7 @@ credit.Train.glm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas],
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
+credit.Train.rf.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', verbose=F, trControl=credit.Train.Control.CV2, tuneLength = 4)
 
 
 #Modelo RPART con tuneLength
@@ -919,7 +925,7 @@ max(credit.Train.rpart.t$results$Accuracy)
 
 ```
 
-Se puede observar que GBM ha conseguido el mejor resultado
+
 
 
 
@@ -928,6 +934,7 @@ Se puede observar que GBM ha conseguido el mejor resultado
 ## 5.1. Comparar el rendimiento de los diferentes modelos
 
 ### Modelo GBM (Stochastic Gradient Boosting)
+
 La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente.
 
 Para los datos transformados:
@@ -946,10 +953,11 @@ max(credit.Train.gbm.nt$results$Accuracy)
 
 Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
 
+Aunque el modelo gbm ha obtenido el mayor accuracy otra vez, se puede observar una disminución del valor con respecto al caso anterior.
 
 
 
-Gráfico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Transformados)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -959,7 +967,7 @@ options(max.print = 1000)
 ```
 
 
-Gráfico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -971,26 +979,26 @@ options(max.print = 1000)
 
 
 
-Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Transformados)
 ```{r}
 plot(credit.Train.gbm.t, metric = "Kappa")
 ```
 
 
-Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 plot(credit.Train.gbm.nt, metric = "Kappa")
 ```
 
 
 
-Gráfico de nivel, precision frente a hiper-parametros (Datos Transformados)
+Gráfico de nivel, precisión frente a hiper-parametros (Datos Transformados)
 
 ```{r}
 plot(credit.Train.gbm.t, plotType = "level")
 ```
 
-Gráfico de nivel, precision frente a hiper-parametros (Datos Sin Transformar)
+Gráfico de nivel, precisión frente a hiper-parametros (Datos Sin Transformar)
 
 ```{r}
 plot(credit.Train.gbm.nt, plotType = "level")
@@ -1070,7 +1078,7 @@ max(credit.Train.gbm.nt$results$Accuracy)
 Se puede observar que la configuracion de hiper-parametros es la misma para los dos. Sin embargo, este modelo ha funcionado ligeramente mejor con los datos sin transformar.
 
 
-Gráfico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Transformados)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1080,7 +1088,7 @@ options(max.print = 1000)
 ```
 
 
-Gráfico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1092,13 +1100,13 @@ options(max.print = 1000)
 
 
 
-Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Transformados)
 ```{r}
 plot(credit.Train.rpart.t, metric = "Kappa")
 ```
 
 
-Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 plot(credit.Train.rpart.nt, metric = "Kappa")
 ```
@@ -1144,7 +1152,7 @@ En este caso se ha obtenido un mejor resultado con los datos transformados.
 
 
 
-Gráfico de la precision del modelo frente a los hiper-parametros (Datos Transformados)
+Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Transformados)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1154,7 +1162,7 @@ options(max.print = 1000)
 ```
 
 
-Gráfico de la precision del modelo frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico de la precisión del modelo frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 # Incrementamos el número de lineas que muestra print
 options(max.print = 10000)
@@ -1166,13 +1174,13 @@ options(max.print = 1000)
 
 
 
-Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Transformados)
+Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Transformados)
 ```{r}
 plot(credit.Train.rf.t, metric = "Kappa")
 ```
 
 
-Gráfico del valor estadistico Kappa frente a los hiper-parametros (Datos Sin Transformar)
+Gráfico del valor estadístico Kappa frente a los hiper-parametros (Datos Sin Transformar)
 ```{r}
 plot(credit.Train.rf.nt, metric = "Kappa")
 ```
