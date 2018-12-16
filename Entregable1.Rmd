@@ -802,19 +802,19 @@ registerDoParallel(cl)
 #Ejecutar Modelos
 #Modelo gbm con tuneGrid
 set.seed(1234)
-credit.Train.gbm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV1, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+credit.Train.gbm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV1, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
 
 #Modelo glm
 set.seed(1234)
-credit.Train.glm<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV1)
+credit.Train.glm.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV1)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rf2<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
+credit.Train.rf.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV1, tuneLength = 4)
 
 #Modelo RF con tuneLength
 set.seed(1234)
-credit.Train.rpart<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV1, tuneLength = 10)
+credit.Train.rpart.nt<-train(credit.Datos.Train[credit.Vars.Entrada.Usadas], credit.Datos.Train[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV1, tuneLength = 10)
 
 
 # Volvemos al modo no paralelo
@@ -826,24 +826,103 @@ registerDoSEQ()
 
 Y aquí los mejores resultados de cada modelo:
 ```{r}
-credit.Train.gbm$bestTune
-max(credit.Train.gbm$results$Accuracy)
+credit.Train.gbm.nt$bestTune
+max(credit.Train.gbm.nt$results$Accuracy)
 
 
 #glm no tiene hiper-parametros
-max(credit.Train.glm$results$Accuracy)
+max(credit.Train.glm.nt$results$Accuracy)
 
 
-credit.Train.rf2$bestTune
-max(credit.Train.rf2$results$Accuracy)
+credit.Train.rf.nt$bestTune
+max(credit.Train.rf2.nt$results$Accuracy)
 
-credit.Train.rpart$bestTune
-max(credit.Train.rpart$results$Accuracy)
+credit.Train.rpart.nt$bestTune
+max(credit.Train.rpart.nt$results$Accuracy)
 
 ```
 
-Se puede observar que GBM ha conseguido un mejor resultado
+Se puede observar que GBM ha conseguido el mejor resultado
 
+
+
+
+### 4.3.2 Modelos con datos transformados
+
+En este entrenamiento usaremos el conjunto de datos de credit.Train.Preprocesado, donde eliminamos y creamos variables y transformamos las que tenía.
+
+```{r}
+set.seed(1234)
+seedsLength=31
+seeds <- vector(mode = "list", length = seedsLength)
+
+# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
+foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
+
+# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
+combHParam=100
+for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
+#H ay que crear una semilla ´unica para el modelo final a entrenar.
+seeds[[seedsLength+1]]<-sample.int(1000, 1)
+
+# TrainControl con seeds
+credit.Train.Control.CV2 <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
+
+
+# Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
+cl <- makeCluster(detectCores()-1)
+registerDoParallel(cl)
+
+#Ejecutar Modelos
+#Modelo gbm con tuneGrid
+set.seed(1234)
+credit.Train.gbm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV2, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
+
+#Modelo glm
+set.seed(1234)
+credit.Train.glm.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV2)
+
+#Modelo RF con tuneLength
+set.seed(1234)
+credit.Train.rf.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
+
+#Modelo RPART con tuneLength
+set.seed(1234)
+credit.Train.rpart.t<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV2, tuneLength = 10)
+
+
+# Volvemos al modo no paralelo
+stopImplicitCluster()
+stopCluster(cl)
+registerDoSEQ()
+
+```
+
+Y aquí los mejores resultados de cada modelo:
+```{r}
+credit.Train.gbm.t$bestTune
+max(credit.Train.gbm.t$results$Accuracy)
+
+
+#glm no tiene hiper-parametros
+max(credit.Train.glm.t$results$Accuracy)
+
+
+credit.Train.rf.t$bestTune
+max(credit.Train.rf.t$results$Accuracy)
+
+credit.Train.rpart.t$bestTune
+max(credit.Train.rpart.t$results$Accuracy)
+
+```
+
+Se puede observar que GBM ha conseguido el mejor resultado
+
+
+
+# 5. Comparar Modelos
+
+## 5.1. Comparar el rendimiento de los diferentes modelos
 
 ### Modelo GBM (Stochastic Gradient Boosting)
 La mejor combiancion de hiper-parametros y el mejor resultado es la siguiente:
@@ -883,82 +962,9 @@ resampleHist(credit.Train.gbm)
 ```
 
 
-### 4.3.2 Modelos con datos transformados
-
-En este entrenamiento usaremos el conjunto de datos de credit.Train.Preprocesado, donde eliminamos y creamos variables y transformamos las que tenía.
-
-```{r}
-set.seed(1234)
-seedsLength=31
-seeds <- vector(mode = "list", length = seedsLength)
-
-# Crearemos unos pliegues para usar los mismos en todos los modelos diferentes
-foldIndexes<-createMultiFolds(credit.Train.Preprocesado[[credit.Var.Salida.Usada]],k=10,times=3)
-
-# combHParam es el n´umero de combinaciones de hiper-par´ametros a probar
-combHParam=100
-for(i in 1:seedsLength) seeds[[i]]<- sample.int(n=1000, combHParam)
-#H ay que crear una semilla ´unica para el modelo final a entrenar.
-seeds[[seedsLength+1]]<-sample.int(1000, 1)
-
-# TrainControl con seeds
-credit.Train.Control.CV2 <- trainControl(method = "repeatedcv",number=10, repeats=3, verboseIter=F, returnResamp = "all", seeds=seeds ) # Guardamos todo para hacer diagramas
-
-
-# Ejecutar el modelo en paralelo (se deja un core siempre libre o se "congela" la consola)
-cl <- makeCluster(detectCores()-1)
-registerDoParallel(cl)
-
-#Ejecutar Modelos
-#Modelo gbm con tuneGrid
-set.seed(1234)
-credit.Train.gbm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='gbm', trControl=credit.Train.Control.CV2, tuneGrid=credit.Train.gbm.grid, verbose=FALSE)
-
-#Modelo glm
-set.seed(1234)
-credit.Train.glm<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='glm', trControl = credit.Train.Control.CV2)
-
-#Modelo RF con tuneLength
-set.seed(1234)
-credit.Train.rf2<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rf', trControl=credit.Train.Control.CV2, tuneLength = 4)
-
-#Modelo RPART con tuneLength
-set.seed(1234)
-credit.Train.rpart<-train(credit.Train.Preprocesado[credit.Vars.Entrada.Usadas], credit.Train.Preprocesado[[credit.Var.Salida.Usada]], method='rpart', trControl=credit.Train.Control.CV2, tuneLength = 10)
-
-
-# Volvemos al modo no paralelo
-stopImplicitCluster()
-stopCluster(cl)
-registerDoSEQ()
-
-```
-
-Y aquí los mejores resultados de cada modelo:
-```{r}
-credit.Train.gbm$bestTune
-max(credit.Train.gbm$results$Accuracy)
-
-
-#glm no tiene hiper-parametros
-max(credit.Train.glm$results$Accuracy)
-
-
-credit.Train.rf2$bestTune
-max(credit.Train.rf2$results$Accuracy)
-
-credit.Train.rpart$bestTune
-max(credit.Train.rpart$results$Accuracy)
-
-```
-
-Se puede observar que GBM ha conseguido un mejor resultado
 
 
 
-# 5. Comparar Modelos
-
-## 5.1. Comparar el rendimiento de los diferentes modelos
 
 ## 5.2. Decidir justificadamente el modelo final
 
